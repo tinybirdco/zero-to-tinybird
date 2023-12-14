@@ -1,0 +1,15 @@
+NODE aggregate_day
+SQL >
+
+    SELECT
+        toStartOfDay(date) AS date,
+        stock_symbol,
+        ROUND(avg(amount), 2) AS price_avg,
+        ROUND(min(amount), 2) AS price_min,
+        ROUND(max(amount), 2) AS price_max
+    FROM stock_price_stream
+    GROUP BY
+        date,
+        stock_symbol
+
+

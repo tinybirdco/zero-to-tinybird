@@ -1,0 +1,21 @@
+NODE create_mv_with_state
+SQL >
+
+    SELECT
+        stock_symbol AS symbol,
+        toStartOfDay(date) AS timestamp,
+        avgState(amount) AS price_avg,
+        minState(amount) AS price_min,
+        maxState(amount) AS price_max,
+        stddevPopState(amount) AS price_stddev
+    FROM stock_price_stream
+    GROUP BY
+        symbol,
+        timestamp
+
+TYPE materialized
+DATASOURCE daily_stats_mv
+ENGINE "AggregatingMergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
+ENGINE_SORTING_KEY "symbol, timestamp"
+

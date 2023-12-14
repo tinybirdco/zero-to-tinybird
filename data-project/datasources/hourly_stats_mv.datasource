@@ -1,0 +1,13 @@
+# Data Source created from Pipe 'feed_hourly_mv_with_state'
+
+SCHEMA >
+    `symbol` String,
+    `timestamp` DateTime,
+    `price_avg` AggregateFunction(avg, Float32),
+    `price_min` AggregateFunction(min, Float32),
+    `price_max` AggregateFunction(max, Float32),
+    `price_stddev` AggregateFunction(stddevPop, Float32)
+
+ENGINE "AggregatingMergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
+ENGINE_SORTING_KEY "timestamp, symbol"

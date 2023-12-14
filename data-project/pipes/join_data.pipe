@@ -1,0 +1,34 @@
+NODE most_recent
+SQL >
+
+    SELECT sps.date, ci.symbol, ci.name, sps.amount 
+    FROM company_info ci, stock_price_stream sps
+    WHERE sps.stock_symbol = 'SUN'
+    AND UPPER(ci.symbol) = UPPER(sps.stock_symbol)
+    ORDER BY date DESC
+
+
+
+NODE most_recent_v2
+SQL >
+
+    SELECT sps.date, ci.symbol, ci.name, sps.amount 
+    FROM company_info ci
+    JOIN stock_price_stream sps
+    ON ci.symbol = sps.stock_symbol
+    WHERE sps.stock_symbol = 'SUN'
+    ORDER BY date DESC
+
+
+
+NODE most_recent_by_sector
+SQL >
+
+    SELECT sps.date, ci.symbol, ci.name, sps.amount, ci.sector 
+    FROM company_info ci
+    JOIN stock_price_stream sps
+    ON ci.symbol = sps.stock_symbol
+    WHERE LOWER(ci.sector) LIKE 'energy'
+    ORDER BY date DESC
+
+

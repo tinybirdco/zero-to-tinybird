@@ -1,0 +1,52 @@
+TOKEN "hourly_stats_endpoint_read_3528" READ
+
+NODE merge_from_mv
+SQL >
+
+    SELECT timestamp, symbol, 
+    avgMerge(price_avg) AS price_avg,
+    minMerge(price_min) as price_min,
+    maxMerge(price_max) as price_max,
+    stddevPopMerge(price_stddev) AS price_stddev
+    FROM hourly_stats_mv
+    GROUP BY timestamp, symbol
+    ORDER BY symbol ASC, timestamp ASC
+
+
+
+NODE filter_by_symbol
+SQL >
+
+    %
+    SELECT * 
+    FROM merge_from_mv
+    WHERE 1=1
+    {% if defined(sym) %}               
+        AND symbol == {{ String(sym,description='description',required=False)}}
+    {% end %}    
+
+
+
+
+NODE filter_by_timestamp
+SQL >
+
+    %
+    SELECT * 
+    FROM filter_by_symbol
+    WHERE 1=1 
+    {% if defined(start_time) and defined(end_time) %}
+          AND toDateTime(timestamp) BETWEEN parseDateTimeBestEffort({{ DateTime(start_time, description="'YYYY-MM-DD HH:mm:ss'. UTC. Optional and defaults to 7 days ago. Defines the start of the period of interest. ") }}) AND parseDateTimeBestEffort({{ DateTime(end_time, description="'YYYY-MM-DD HH:mm:ss'. UTC. Optional and defaults to time of request. Defines the end of the period of interest.") }})
+       {% end %}
+     {% if not defined(start_time) and not defined(end_time) %}
+        AND toDateTime(timestamp) BETWEEN addDays(now(),-7) AND NOW()
+     {% end %}
+     {% if defined(start_time) and not defined(end_time) %}
+         AND toDateTime(timestamp) BETWEEN parseDateTimeBestEffort({{ DateTime(start_time) }}) AND now()
+     {% end %}
+     {% if not defined(start_time) and defined(end_time) %}
+         AND toDateTime(timestamp) BETWEEN addDays(toDateTime(parseDateTimeBestEffort({{DateTime(end_time)}}),-7) AND parseDateTimeBestEffort({{ DateTime(end_time) }})
+     {% end %}
+
+
+

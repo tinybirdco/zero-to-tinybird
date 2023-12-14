@@ -1,0 +1,30 @@
+TOKEN "filter_endpoint_read_3024" READ
+
+NODE filter_0
+SQL >
+
+    SELECT * 
+    FROM stock_price_stream
+    WHERE stock_symbol = 'SUN'
+    ORDER BY date DESC
+
+
+
+NODE filter_1
+DESCRIPTION >
+    {% set symbol = 'ENI' %}
+
+SQL >
+
+    %
+
+    SELECT * 
+    FROM stock_price_stream
+    WHERE 1=1
+    {% if defined(stock_symbol) %}
+        AND stock_symbol = {{ String(stock_symbol, description='Symbol of interest.') }}
+    {% end %}
+    ORDER BY date DESC
+    LIMIT {{ Int32(max_results, 10, description="The maximum number of reports to return per response.") }}
+
+

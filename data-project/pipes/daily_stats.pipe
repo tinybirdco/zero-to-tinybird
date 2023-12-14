@@ -1,0 +1,27 @@
+NODE merge_from_mv
+SQL >
+
+    SELECT timestamp, symbol, 
+    avgMerge(price_avg) AS price_avg,
+    minMerge(price_min) AS price_min,
+    maxMerge(price_max) AS price_max,
+    stddevPopMerge(price_stddev) AS price_stddev
+    FROM daily_stats_mv
+    GROUP BY timestamp, symbol
+    ORDER BY symbol ASC, timestamp ASC
+
+
+
+NODE filter_by_symbol
+SQL >
+
+    %
+    SELECT * 
+    FROM merge_from_mv
+    WHERE 1=1
+    {% if defined(sym) %}               
+        AND symbol == {{ String(sym,description='description',required=False)}}
+    {% end %}    
+
+
+

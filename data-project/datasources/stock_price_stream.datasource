@@ -1,0 +1,9 @@
+
+SCHEMA >
+    `amount` Float32 `json:$.amount`,
+    `date` DateTime `json:$.date`,
+    `stock_symbol` String `json:$.stock_symbol`
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYear(date)"
+ENGINE_SORTING_KEY "date, stock_symbol"

@@ -1,0 +1,10 @@
+
+SCHEMA >
+    `symbol` String,
+    `name` String,
+    `creation_date` Date,
+    `sector` String
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYear(creation_date)"
+ENGINE_SORTING_KEY "creation_date, sector, name, symbol"

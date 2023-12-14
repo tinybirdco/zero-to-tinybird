@@ -1,0 +1,56 @@
+NODE aggregate_hourly
+SQL >
+
+    SELECT
+        toStartOfHour(date) AS hour,
+        stock_symbol,
+        ROUND(avg(amount), 2) AS price_avg,
+        ROUND(min(amount), 2) AS price_min,
+        ROUND(max(amount), 2) AS price_max
+    FROM stock_price_stream
+    GROUP BY
+        date,
+        stock_symbol
+    ORDER BY
+        date DESC,
+        stock_symbol ASC    
+
+
+
+NODE aggregate_minute
+SQL >
+
+    SELECT
+        toStartOfMinute(date) AS minute,
+        stock_symbol,
+        ROUND(avg(amount), 2) AS price_avg,
+        ROUND(min(amount), 2) AS price_min,
+        ROUND(max(amount), 2) AS price_max
+    FROM stock_price_stream
+    GROUP BY
+        date,
+        stock_symbol
+    ORDER BY
+        date ASC,
+        stock_symbol ASC    
+
+
+
+NODE aggregate_day
+SQL >
+
+    SELECT
+        toStartOfDay(date) AS date,
+        stock_symbol,
+        ROUND(avg(amount), 2) AS price_avg,
+        ROUND(min(amount), 2) AS price_min,
+        ROUND(max(amount), 2) AS price_max
+    FROM stock_price_stream
+    GROUP BY
+        date,
+        stock_symbol
+    ORDER BY
+        date DESC,
+        stock_symbol ASC    
+
+
