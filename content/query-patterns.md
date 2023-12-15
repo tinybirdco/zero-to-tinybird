@@ -1,6 +1,6 @@
 # Query patterns
 
-A collection of SQL patterns. 
+A collection of SQL patterns. A WIP! 
 
 These queries have been constructed in reference to these two schemas:
 
@@ -42,6 +42,36 @@ SELECT *
 FROM stock_price_stream
 WHERE toDateTime(date) BETWEEN '2023-12-07 17:22:00' AND '2023-12-07 17:23:00'
 ```
+
+### Selecting most recent data within an explicit time window
+
+```sql
+%
+WITH RankedData AS (
+    SELECT
+        symbol,
+        timestamp,
+        amount,
+        ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY timestamp DESC) AS row_num
+    FROM
+        stock_price_stream
+     WHERE timestamp > NOW() - interval {{Int16(time_window_minutes, 10, description="Results will be based on this number of minutes of data history. ")}} MINUTE
+)
+SELECT
+    symbol,
+    timestamp,
+    amount
+FROM
+    RankedData
+WHERE
+    row_num = 1
+
+```
+
+
+
+## JOIN patterns
+
 
 
 
