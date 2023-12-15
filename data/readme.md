@@ -1,6 +1,14 @@
 # Creating Data Sources from files
 
 
+## Using "Remote URL" feature to load CSV
+
+Navigate to add a Data Source, and select the "Remote URL" option. Paste the following URL into the text box:
+
+```https://raw.githubusercontent.com/tinybirdco/zero-to-tinybird/main/data/company-info.csv?token=GHSAT0AAAAAACBNU2HVUFEKA6NDHUSSST2WZL4YHJQ```
+ 
+
+
 
 ## Loading CSV from a Github repository
 
