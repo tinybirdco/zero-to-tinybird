@@ -24,7 +24,7 @@ This reposity includes resources to help attendees compile documentation and oth
   * What is Tinybird?
   * Key Tinybird features. 
   * Why use Tinybird? Benefits of using Tinybird to implement build real-time architectures.
-  * Tinybird glossary of terms, estab
+  * Tinybird glossary of terms, establish a common nomenclature for discussing real-time data and event-driven architectures. 
 
 ### Creating Data Sources
   * Introduction to native connectors: Kafka/Confluent streams, AWS S3, BigQuery, and Snowflake.
