@@ -164,6 +164,8 @@ Second, anomalies are scanned for using the `_anomaly_scan_time_window_seconds` 
 The `zscore_multiplier` parameter was added recently and defaults to 2. 
 These parameters, could be promoted to API Endpoint query parameters.
 
+- [ ] This recipe depends on two queries. The first calculates the Z-score, the second show an example for comparing with a absolute Z-score to identify anomalies. 
+
 ```sql
 %
 {% set _stats_time_window_minutes=10 %}
@@ -174,7 +176,7 @@ WITH stats AS (
         avg(amount) AS average,
         stddevPop(amount) AS stddev
     FROM stock_price_stream
-    WHERE date BETWEEN NOW() - INTERVAL {{Int16(_stats_time_window_minutes)}} MINUTE AND NOW()
+    WHERE date BETWEEN NOW() - INTERVAL _stats_time_window_minutes MINUTE AND NOW()
     GROUP BY symbol  
 )
 SELECT sps.date, 
@@ -182,22 +184,20 @@ SELECT sps.date,
      sps.amount, 
      (sps.amount - stats.average)/stats.stddev AS zscore,
      stats.average,
-     stats.stddev,
-     {{Int16(zscore_multiplier, 2, description="Z-Score multipler to identify anomalies.")}} AS zscore_multiplier
+     stats.stddev
 FROM stock_price_stream sps
 JOIN stats s ON s.symbol = sps.symbol
-WHERE date BETWEEN NOW() - interval {{Int16(_anomaly_scan_time_window_seconds)}} SECOND AND NOW()
-ORDER BY date desc
-
+WHERE date BETWEEN NOW() - INTERVAL _anomaly_scan_time_window_seconds SECOND AND NOW()
+ORDER BY date DESC
 ```
 
 ### Comparing data with thresholds
 
 
 ```sql
-SELECT *, 0.75 AS min_value, 1.0 AS max_value 
+SELECT * 
 FROM stock_price_stream
-WHERE (amount < 200 OR amount > 2000)
+WHERE amount < 0.05 OR amount > 0.95
 LIMIT 10
 ```
 
