@@ -11,8 +11,8 @@ These queries have been constructed in reference to these two schemas:
 `date` DateTime `json:$.date` ,
 `stock_symbol` String `json:$.stock_symbol` ,
 ```
-  [] Mockingbird emits JSON and the schema indicates how that JSON is parsed by key to extract the values.  
-  [] For `amount`, update Mockingbird type to `#####.##` currency and rename to `price`? Or just update Data Source schema, `price` Decimal(10,2) `json:$amount`?
+- [ ] Mockingbird emits JSON and the schema indicates how that JSON is parsed by key to extract the values.  
+- [ ] For `amount`, update Mockingbird type to `#####.##` currency and rename to `price`? Or just update Data Source schema, `price` Decimal(10,2) `json:$amount`?
   
 `company_info` - Mock data about ~85 fictional companies. 
 
@@ -33,7 +33,7 @@ To gain a wide prespective of how to work with timetamps in Tinybird, these guid
 ```sql
 SELECT * 
 FROM stock_price_stream
-WHERE toDateTime(date) BETWEEN addHours(now(),-1) AND NOW()
+WHERE toDateTime(date) BETWEEN addHours(NOW(),-1) AND NOW()
 ```
 
 ### Data between explicit dates
@@ -45,6 +45,8 @@ WHERE toDateTime(date) BETWEEN '2023-12-07 17:22:00' AND '2023-12-07 17:23:00'
 
 ### Selecting most recent data within an explicit time window
 
+This query is hardcoded to 'look back' sixty minutes. 
+
 ```sql
 %
 WITH RankedData AS (
@@ -55,7 +57,7 @@ WITH RankedData AS (
         ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY timestamp DESC) AS row_num
     FROM
         stock_price_stream
-     WHERE timestamp > NOW() - interval {{Int16(time_window_minutes, 10, description="Results will be based on this number of minutes of data history. ")}} MINUTE
+     WHERE timestamp > NOW() - INTERVAL 60 MINUTE
 )
 SELECT
     symbol,
@@ -85,6 +87,7 @@ JOIN stock_price_stream sps
 ON ci.symbol = sps.stock_symbol
 WHERE sps.stock_symbol = 'SUN'
 ORDER BY date DESC
+LIMIT 10
 ```
 
 ## Calculating slope
@@ -94,22 +97,22 @@ ORDER BY date DESC
 {% set time_window_minutes=30 %}
 {% set max_slope=3 %}
 
-SELECT id, 
-timestamp, 
+SELECT symbol, 
+date, 
 previous_timestamp,
-(amount - previous_amount) / (timestamp - previous_timestamp) as slope,
+(amount - previous_amount) / (date - previous_date) as slope,
 amount, 
 previous_amount,
-(amount - previous_amount) as value_diff,
-(timestamp - previous_timestamp) as time_diff,
+(amount - previous_amount) as amount_diff,
+(date - previous_date) as time_diff,
 {{Int16(max_slope, 3, description="Integer. Maximum slope, any higher than this are returned.")}} as max_slope,
 lagInFrame(timestamp, 1) OVER 
-(PARTITION BY symbol ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_timestamp, 
+(PARTITION BY symbol ORDER BY date ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_date, 
 lagInFrame(amount, 1) 
-OVER (PARTITION BY symbol ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_amount
-FROM incoming_data
-WHERE timestamp > NOW() - INTERVAL {{Int8(time_window_minutes, 30, description="Search this many most recent minutes of the data history.")}} MINUTE
-  ORDER BY timestamp DESC
+OVER (PARTITION BY symbol ORDER BY date ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_amount
+FROM stock_price_stream
+WHERE date > NOW() - INTERVAL time_window_minutes MINUTE
+  ORDER BY date DESC
 
 ```
 
