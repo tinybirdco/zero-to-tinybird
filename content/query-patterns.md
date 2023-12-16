@@ -113,7 +113,34 @@ WHERE timestamp > NOW() - INTERVAL {{Int8(time_window_minutes, 30, description="
 
 ```
 
+### Anomaly detection with SQL
 
+
+#### Interquartile Range
+
+```sql
+WITH stats AS (SELECT symbol
+quantileExact(0.25) (amount) AS lower_quartile,
+quantileExact(0.5) (amount) AS mid_quartile,
+quantileExact(0.75) (amount) AS upper_quartile,
+(upper_quartile - lower_quartile) * 1.5 AS IQR
+FROM stock_price_stream
+WHERE timestamp >= toDate(NOW()) - INTERVAL 10 MINUTES
+GROUP BY symbol
+LIMIT 10
+)
+ SELECT DISTINCT timestamp, 
+    symbol, 
+    amount, 
+    ROUND((stats.lower_quartile - stats.IQR),2) AS lower_bound, 
+    ROUND((stats.upper_quartile + stats.IQR),2) AS upper_bound 
+ FROM stock_price_stream
+ JOIN stats ON incoming_data.symbol = stats.symbol
+ WHERE timestamp >= toDate(NOW()) - INTERVAL 10 MINUTES
+ AND (amount > (stats.upper_quartile + stats.IQR)
+ OR amount < (stats.lower_quartile - stats.IQR))
+ ORDER BY timestamp DESC
+```
 
 
 #### Other things
