@@ -113,10 +113,9 @@ WHERE timestamp > NOW() - INTERVAL {{Int8(time_window_minutes, 30, description="
 
 ```
 
-### Anomaly detection with SQL
+## Anomaly detection with SQL
 
-
-#### Interquartile Range
+### Interquartile Range
 
 Based on a time window (defaulting here to a 10-minute window), calculate the lower quartile, the medium, and the upper quartile. The IQR is then set to (uper quartile - lower quartile) * 1.5.
 
@@ -189,11 +188,21 @@ ORDER BY date desc
 
 ```
 
+### Comparing data with thresholds
+
+
+```sql
+SELECT *, 0.75 AS min_value, 1.0 AS max_value 
+FROM stock_price_stream
+WHERE (amount < 200 OR amount > 2000)
+LIMIT 10
+```
+
 
 
 #### Other things
 
-When pulling these objects from API Endpoints, here is what these `stock price" and "comapny info" look like: 
+When pulling these objects from API Endpoints, here is what these `stock price" and "comapny info" objects look like: 
 
 ```json
 {
