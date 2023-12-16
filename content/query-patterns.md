@@ -68,11 +68,33 @@ WHERE
 
 ```
 
-
-
 ## JOIN patterns
 
+## Calculating slope
 
+```sql
+%
+{% set time_window_minutes=30 %}
+{% set max_slope=3 %}
+
+SELECT id, 
+timestamp, 
+previous_timestamp,
+(amount - previous_amount) / (timestamp - previous_timestamp) as slope,
+amount, 
+previous_amount,
+(amount - previous_amount) as value_diff,
+(timestamp - previous_timestamp) as time_diff,
+{{Int16(max_slope, 3, description="Integer. Maximum slope, any higher than this are returned.")}} as max_slope,
+lagInFrame(timestamp, 1) OVER 
+(PARTITION BY symbol ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_timestamp, 
+lagInFrame(amount, 1) 
+OVER (PARTITION BY symbol ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_amount
+FROM incoming_data
+WHERE timestamp > NOW() - INTERVAL {{Int8(time_window_minutes, 30, description="Search this many most recent minutes of the data history.")}} MINUTE
+  ORDER BY timestamp DESC
+
+```
 
 
 
