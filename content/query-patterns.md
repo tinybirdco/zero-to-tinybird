@@ -11,7 +11,7 @@ These queries have been constructed in reference to these two schemas:
 `date` DateTime `json:$.date` ,
 `stock_symbol` String `json:$.stock_symbol` ,
 ```
-  [] Mockingbird emits JSON and the schema indicates what 
+  [] Mockingbird emits JSON and the schema indicates how that JSON is parsed by key to extract the values.  
   [] For `amount`, update Mockingbird type to `#####.##` currency and rename to `price`? Or just update Data Source schema, `price` Decimal(10,2) `json:$amount`?
   
 `company_info` - Mock data about ~85 fictional companies. 
