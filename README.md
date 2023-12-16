@@ -1,8 +1,8 @@
 # The Zero-to-Tinybird Workshop 
 
-This repository is a companion piece to the 'Zero-to-Tinybird` 90-minute workshop. The intended audience of this workshop are people who have no experience with Tinybird and are looking to learn the basics with 90 minutes of hands on content. The intent of this workshop is to teach the basics of creating Data Sources, building Pipes, designing Materialized Views, deploying API Endpoints with dynamic query parameters, and provide introductions to the Tinybird command-line interface (CLI) and Versions. 
+This repository is a companion piece to the 'Zero-to-Tinybird` 90-minute workshop. The intended audience of this workshop are people who have no experience with Tinybird and are looking to learn the basics with 90 minutes of hands on content. The intent of this workshop is to teach the basics of creating Data Sources, building Pipes, designing Materialized Views, deploying API Endpoints with dynamic query parameters, and providing introductions to the Tinybird command-line interface (CLI) and Tinybird Versions. 
 
-This reposity includes resources to help attendees compile documentation and other content focused on these topics. It also includes the Data Project used in the workshop. 
+This repository includes resources to help attendees find documentation and other content focused on these topics. It also includes the Data Project used in the workshop. 
 
 ## Workshop sections
 
