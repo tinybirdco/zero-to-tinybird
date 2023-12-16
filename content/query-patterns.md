@@ -70,6 +70,23 @@ WHERE
 
 ## JOIN patterns
 
+```sql
+SELECT sps.date, ci.symbol, ci.name, sps.amount 
+FROM company_info ci, stock_price_stream sps
+WHERE ci.symbol = sps.stock_symbol
+ORDER BY date DESC
+LIMIT 10
+```
+
+```sql
+SELECT sps.date, ci.symbol, ci.name, sps.amount 
+FROM company_info ci
+JOIN stock_price_stream sps
+ON ci.symbol = sps.stock_symbol
+WHERE sps.stock_symbol = 'SUN'
+ORDER BY date DESC
+```
+
 ## Calculating slope
 
 ```sql
