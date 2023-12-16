@@ -52,16 +52,16 @@ This query is hardcoded to 'look back' sixty minutes.
 WITH RankedData AS (
     SELECT
         symbol,
-        timestamp,
+        date,
         amount,
-        ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY timestamp DESC) AS row_num
+        ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY date DESC) AS row_num
     FROM
         stock_price_stream
-     WHERE timestamp > NOW() - INTERVAL 60 MINUTE
+     WHERE date > NOW() - INTERVAL 60 MINUTE
 )
 SELECT
     symbol,
-    timestamp,
+    date,
     amount
 FROM
     RankedData
@@ -76,7 +76,6 @@ WHERE
 SELECT sps.date, ci.symbol, ci.name, sps.amount 
 FROM company_info ci, stock_price_stream sps
 WHERE ci.symbol = sps.stock_symbol
-ORDER BY date DESC
 LIMIT 10
 ```
 
@@ -85,8 +84,6 @@ SELECT sps.date, ci.symbol, ci.name, sps.amount
 FROM company_info ci
 JOIN stock_price_stream sps
 ON ci.symbol = sps.stock_symbol
-WHERE sps.stock_symbol = 'SUN'
-ORDER BY date DESC
 LIMIT 10
 ```
 
