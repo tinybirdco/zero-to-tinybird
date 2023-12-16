@@ -118,6 +118,13 @@ WHERE timestamp > NOW() - INTERVAL {{Int8(time_window_minutes, 30, description="
 
 #### Interquartile Range
 
+Based on a time window (defaulting here to a 10-minute window), calculate the lower quartile, the medium, and the upper quartile. The IQR is then set to (uper quartile - lower quartile) * 1.5.
+
+Based on the IQR, lower and upper bounds are set for determining data outliers:
+* lower bound = lower quartile - IQR
+* upper bound = upper quartile - IQR
+
+
 ```sql
 WITH stats AS (SELECT symbol
 quantileExact(0.25) (amount) AS lower_quartile,
@@ -141,6 +148,47 @@ LIMIT 10
  OR amount < (stats.lower_quartile - stats.IQR))
  ORDER BY timestamp DESC
 ```
+
+### Z-Score
+
+This implements a simple algorith based on a time-series average and standard deviation over a minute-scale window of data. Each incoming data point, x, has a Z-Score calculated in this way:  
+
+`zscore = (x - avg) / stddev`
+
+Currently, this Pipe is based on two time windows: 
+First, the statistics are calculated across the `_stats_time_window_minutes`.
+Second, anomalies are scanned for using the `_anomaly_scan_time_window_seconds` window.
+
+The `zscore_multiplier` parameter was added recently and defaults to 2. 
+These parameters, could be promoted to API Endpoint query parameters.
+
+```sql
+%
+{% set _stats_time_window_minutes=10 %}
+{% set _anomaly_scan_time_window_seconds=30 %}
+
+WITH stats AS (
+    SELECT symbol,
+        avg(amount) AS average,
+        stddevPop(amount) AS stddev
+    FROM stock_price_stream
+    WHERE date BETWEEN NOW() - INTERVAL {{Int16(_stats_time_window_minutes)}} MINUTE AND NOW()
+    GROUP BY symbol  
+)
+SELECT sps.date, 
+     sps.symbol, 
+     sps.amount, 
+     (sps.amount - stats.average)/stats.stddev AS zscore,
+     stats.average,
+     stats.stddev,
+     {{Int16(zscore_multiplier, 2, description="Z-Score multipler to identify anomalies.")}} AS zscore_multiplier
+FROM stock_price_stream sps
+JOIN stats s ON s.symbol = sps.symbol
+WHERE date BETWEEN NOW() - interval {{Int16(_anomaly_scan_time_window_seconds)}} SECOND AND NOW()
+ORDER BY date desc
+
+```
+
 
 
 #### Other things
