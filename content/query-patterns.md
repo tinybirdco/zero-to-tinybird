@@ -2,32 +2,21 @@
 
 A collection of SQL patterns. A WIP! 
 
-These queries have been constructed in reference to these two schemas:
-
-`stock_price_stream` - a real-time stream of stock price events generated with Mockingbird and written to the Events API. 
-
-```
-`amount` Float32 `json:$.amount` ,
-`date` DateTime `json:$.date` ,
-`stock_symbol` String `json:$.stock_symbol` ,
-```
-- [ ] Mockingbird emits JSON and the schema indicates how that JSON is parsed by key to extract the values.  
-- [ ] For `amount`, update Mockingbird type to `#####.##` currency and rename to `price`? Or just update Data Source schema, `price` Decimal(10,2) `json:$amount`?
-  
-`company_info` - Mock data about ~85 fictional companies. 
-
-```
-`symbol` String,
-`name` String,
-`creation_date` Date,
-`sector` String,
-```
+These SQL examples are built with [two simple schemas](#data-schema) that describe the data sets using in the workshop. 
 
 ## Working with time
 
-To gain a wide prespective of how to work with timetamps in Tinybird, these guides are critical:
+Real-time event data are based on date and time objects. When working with real-time events, the time of when the event happened is integral to vast majority of all questions asked of the data. How many times has something happened in that month, day, hour, minute, or second? How have the temporal patterns of an event evolved and formed over time?  
+
+So, most of the queries you build in Tinybird will have time details built into them. To gain a wide prespective of how to work with timetamps in Tinybird, these guides are critical:
 * https://www.tinybird.co/docs/guides/working-with-time.html
 * https://www.tinybird.co/docs/guides/best-practices-for-timestamps.html
+
+Note:
+* The sooner you standardize on the UTC timezone for all things time, the better. Let the client display composer convert to local time if needed. If you are working with data generators, push the data already in UTC. For example, with Python, be sure to generate timestamps in UTC (`current_time = datetime.datetime.utcnow()`). 
+* ClickHouse provides a set of time functions that make working with time data easier. Like most data environments, ClickHouse supports both Date and DateTime objects. Check out [this ClickHouse guide](https://clickhouse.com/docs/en/sql-reference/functions/date-time-functions) for the details (tere is also this ClickHouse [blog post](https://clickhouse.com/blog/working-with-time-series-data-and-functions-ClickHouse). Functions such as [toStartOfDay](https://clickhouse.com/docs/en/sql-reference/functions/date-time-functions#tostartofmonth) are fantastic for binning and processing time-series data. If you have ever needed to bin time data in SQL, you will really appreciate these functions.
+* Tinybird servers are configured to store data in UTC. 
+  
 
 ### Data from the most recent hour
 ```sql
@@ -72,6 +61,8 @@ WHERE
 
 ## JOIN patterns
 
+Tinybird is built to help users unify their data sources. Our users want to combine their data sources in Tinybird so they can blend it all into their analysis and output. One of the most fundamental use cases for Tinybird is *enriching real-time data* with dimensional data. This is all made possible by *joining* the data. When you *JOIN* data in SQL you are linking, mapping, and associating common data attributes from two or more sources. 
+
 ```sql
 SELECT sps.date, ci.symbol, ci.name, sps.amount 
 FROM company_info ci, stock_price_stream sps
@@ -88,6 +79,11 @@ LIMIT 10
 ```
 
 ## Calculating slope
+
+Developing a recipe for calculating data slopes or rates of change is surprisingly complicated (at least to me). To calculate the slope of two consectutive data points depends on *window* functions. The recipe below depends on the ClickHouse `lagInFrame` function (See this discussion on [ClickHouse window functions](https://clickhouse.com/docs/en/sql-reference/window-functions#functions)), which requires the construction of time window specification, e.g. `(PARTITION BY symbol ORDER BY date ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)`.
+
+ (PARTITION BY partition_columns_list [ORDER BY order_by_columns_list] frame_specification)
+
 
 ```sql
 %
@@ -198,6 +194,28 @@ WHERE amount < 0.05 OR amount > 0.95
 LIMIT 10
 ```
 
+## Data schema
+
+These queries have been constructed in reference to these two schemas:
+
+`stock_price_stream` - a real-time stream of stock price events generated with Mockingbird and written to the Events API. 
+
+```
+`amount` Float32 `json:$.amount` ,
+`date` DateTime `json:$.date` ,
+`stock_symbol` String `json:$.stock_symbol` ,
+```
+- [ ] Mockingbird emits JSON and the schema indicates how that JSON is parsed by key to extract the values.  
+- [ ] For `amount`, update Mockingbird type to `#####.##` currency and rename to `price`? Or just update Data Source schema, `price` Decimal(10,2) `json:$amount`?
+  
+`company_info` - Mock data about ~85 fictional companies. 
+
+```
+`symbol` String,
+`name` String,
+`creation_date` Date,
+`sector` String,
+```
 
 
 #### Other things
