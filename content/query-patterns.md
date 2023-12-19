@@ -218,9 +218,9 @@ These queries have been constructed in reference to these two schemas:
 ```
 
 
-#### Other things
+# Other things
 
-### Endpoint output objects
+## Endpoint output objects
 
 When pulling these objects from API Endpoints, here is what these `stock price" and "comapny info" objects look like: 
 
@@ -241,7 +241,7 @@ When pulling these objects from API Endpoints, here is what these `stock price" 
     "stock_symbol": "TTM"
 }
 ```
-### SQL helpers 
+## SQL helpers 
 
 Formating numbers, trimming to 2 digits. 
 `ROUND(x,2)`
@@ -255,7 +255,7 @@ Comparing strings.
 
 
 
-### Renaming objects along the pipeway
+## Renaming objects along the pipeway
 
 * When generated.
 * In Data Source defintion.
