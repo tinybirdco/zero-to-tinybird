@@ -101,7 +101,7 @@ LIMIT 10
 #### Performance considerations
 
 * Column indexes: Ensure you have indexes on the join columns (`symbol` in the `company_info` table, and `stock_symbol` in the other table) for optimal performance.
-Filtering: If you have additional filtering criteria, consider adding them to the WHERE clause before the join to reduce the number of rows involved.
+* Filtering: If you have additional filtering criteria, consider adding them to the WHERE clause before the join to reduce the number of rows involved.
 
 
 
