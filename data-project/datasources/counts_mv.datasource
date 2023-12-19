@@ -1,0 +1,8 @@
+# Data Source created from Pipe 'feed_counts_mv_with_state'
+
+SCHEMA >
+    `stock_symbol` String,
+    `total_events` AggregateFunction(count)
+
+ENGINE "AggregatingMergeTree"
+ENGINE_SORTING_KEY "stock_symbol"
