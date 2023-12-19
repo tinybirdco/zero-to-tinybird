@@ -1,3 +1,13 @@
+DESCRIPTION >
+	Provides *hourly* statistics and gets data from the `hourly_stats_mv` Data Source. This Materialized View is populated with the `feed_hourly_mv_with_state` Pipe. 
+
+In the first Node, we are using the `-State` function for the stats we are generating (average, min, max). For fun, we are also generating the standard deviation for the data retrieved.
+
+The second node adds support for a dynamic `sym` query parameter for selecting a `stock_symbol` of interest. 
+
+Fwiw, these two nodes could be combined into one.
+
+
 TOKEN "hourly_stats_endpoint_read_3528" READ
 
 NODE merge_from_mv
@@ -15,6 +25,11 @@ SQL >
 
 
 NODE filter_by_symbol
+DESCRIPTION >
+    Adding support for an optional `sym` query parameter for selecting the symbol of interest.
+
+    This Node returns results in **reverse chronological order**.
+
 SQL >
 
     %
@@ -24,6 +39,7 @@ SQL >
     {% if defined(sym) %}               
         AND symbol == {{ String(sym,description='description',required=False)}}
     {% end %}    
+    ORDER BY timestamp DESC
 
 
 

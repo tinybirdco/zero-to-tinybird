@@ -1,11 +1,15 @@
+DESCRIPTION >
+	A Pipe that illustrates different patterns for JOINing Data Sources.
+
+
 NODE most_recent
 SQL >
 
     SELECT sps.date, ci.symbol, ci.name, sps.amount 
     FROM company_info ci, stock_price_stream sps
-    WHERE sps.stock_symbol = 'SUN'
-    AND UPPER(ci.symbol) = UPPER(sps.stock_symbol)
+    WHERE ci.symbol = sps.stock_symbol
     ORDER BY date DESC
+    LIMIT 10
 
 
 

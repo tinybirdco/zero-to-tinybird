@@ -1,6 +1,10 @@
+DESCRIPTION >
+	Examples for filtering on attributes of interest.
+
+
 TOKEN "filter_endpoint_read_3024" READ
 
-NODE filter_0
+NODE fundamental_pattern
 SQL >
 
     SELECT * 
@@ -10,7 +14,7 @@ SQL >
 
 
 
-NODE filter_1
+NODE endpoint
 DESCRIPTION >
     {% set symbol = 'ENI' %}
 
