@@ -52,6 +52,11 @@ toStartOfMinute(date) AS hour
 ### Joining data
 
 ```sql
+SELECT sps.date, ci.symbol, ci.name, sps.amount 
+FROM company_info ci, stock_price_stream sps
+WHERE ci.symbol = sps.stock_symbol
+ORDER BY date DESC
+LIMIT 10
 ```
 
 ```sql
