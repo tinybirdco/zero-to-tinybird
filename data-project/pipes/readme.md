@@ -23,7 +23,7 @@ ORDER BY date DESC
 LIMIT 100
 ```
 
-Here we have that same query, except that it now support *dynamic query parameters* that can be used when requesting data via an API Endpoint published from the Pipe. These request parameters can filter the data by a `stock_symbol` of interest and limit the number of results to a `max_results` maximum. 
+Here we have that same query, except that it now supports *dynamic query parameters* that can be used when requesting data via an API Endpoint published from the Pipe. These request parameters can filter the data by a `stock_symbol` of interest and limit the number of results to a `max_results` maximum. 
 
 Since we are making the use of `stock_symbol` optional with the `if defined(stock_symbol)` templating syntax, we need to use the `1=1` convention in the `WHERE` clause, since it prevents an empty `WHERE` clause if the user does not specify a symbol. 
 
@@ -41,6 +41,8 @@ LIMIT {{ Int32(max_results, 10, description="The maximum number of reports to re
 ```
 
 ### Aggregating data
+
+Here we are generating a daily time-series of average, minimum, and maximum values. 
 
 ```sql
 SELECT
