@@ -1,13 +1,26 @@
 ## Fundamental patterns
 
+Here we explore three fundamental patterns of how SQL is used to explore and transform data:  filtering, aggregating, and joining.
 
 ### Filtering data
+
+Here we filter on events that have a stock symboi of interest. This query helps illustrate a common structure: SELECT | FROM | WHERE | ORDER. 
 
 ```sql
 SELECT * 
 FROM stock_price_stream
 WHERE stock_symbol = 'TTM'
 ORDER BY date DESC
+```
+
+While learning SQL (and even if you are an 'expert', it is recommended to to also use a `LIMIT` statement to *limit* the number of events/objects/results to return. For the above query, if only the 100 most recent events are of interest, you can add the `LIMIT` statement:
+
+```sql
+SELECT * 
+FROM stock_price_stream
+WHERE stock_symbol = 'TTM'
+ORDER BY date DESC
+LIMIT 100
 ```
 
 ```sql
