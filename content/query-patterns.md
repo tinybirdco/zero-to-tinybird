@@ -220,6 +220,8 @@ These queries have been constructed in reference to these two schemas:
 
 #### Other things
 
+### Endpoint output objects
+
 When pulling these objects from API Endpoints, here is what these `stock price" and "comapny info" objects look like: 
 
 ```json
@@ -239,3 +241,23 @@ When pulling these objects from API Endpoints, here is what these `stock price" 
     "stock_symbol": "TTM"
 }
 ```
+### SQL helpers 
+
+Formating numbers, trimming to 2 digits. 
+`ROUND(x,2)`
+
+Renaming attributes.
+`MAX(price) AS max_price`
+
+Comparing strings.
+`LOWER(thisCityName) = 'london'` 
+`UPPER(thisCityName) = 'LONDON'` 
+
+
+
+### Renaming objects along the pipeway
+
+* When generated.
+* In Data Source defintion.
+* In SQL queries.
+
