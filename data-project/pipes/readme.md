@@ -1,4 +1,4 @@
-## Fundamental patterns
+## Fundamental query patterns
 
 Here we explore three fundamental patterns of how SQL is used to explore and transform data:  filtering, aggregating, and joining.
 
