@@ -13,7 +13,7 @@ WHERE stock_symbol = 'TTM'
 ORDER BY date DESC
 ```
 
-While learning SQL (and even if you are an 'expert', it is recommended to to also use a `LIMIT` statement to *limit* the number of events/objects/results to return. For the above query, if only the 100 most recent events are of interest, you can add the `LIMIT` statement, for a `SELECT | FROM | WHERE | ORDER | LIMIT` structure:
+While learning SQL (and even if you are an 'expert'), it is recommended to to also use a `LIMIT` statement to *limit* the number of events/objects/results to return. For the above query, if only the 100 most recent events are of interest, you can add the `LIMIT` statement, for a `SELECT | FROM | WHERE | ORDER | LIMIT` structure:
 
 ```sql
 SELECT * 
