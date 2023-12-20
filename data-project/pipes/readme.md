@@ -114,6 +114,28 @@ LIMIT 10
 
 ## Materialized Views
 
+* Documentation:
+  + https://www.tinybird.co/docs/concepts/materialized-views.html
+  + https://www.tinybird.co/docs/guides/materialized-views.html
+* Blog posts:
+  + https://www.tinybird.co/blog-posts/what-are-materialized-views-and-why-do-they-matter-for-realtime
+* Screencasts:
+  + https://www.youtube.com/watch?v=inhCgVU4dKY
+  + https://www.youtube.com/watch?v=PJHPq0-08Wc
+
+Materialize Views (MVs) consists of several components. For the workshop, we have three components:
+
+* A Pipe that applies -State operations and writes them to a Data Source. These actions are triggered as data is ingested, and query results are written to a Materialized Data Source.  
+  * `avgState(amount)` AS price_avg
+* A Data Source that stores the state data. This is a collection of recently generated data partitions that are assembled when a 'calling' query is made.
+  * `TYPE materialized`
+  * `DATASOURCE daily_stats_mv`
+  * `ENGINE "AggregatingMergeTree"`
+* A Pipe that applies -Merge operations. These operations happen at query time. When an API Endpoint is deployed, this Pipe assembles (merges) and serves each request. 
+  * `avgMerge(price_avg)` AS price_avg 
+
+
+
 ### Pipes that feed state data to Data Sources
 + *feed_counts_mv_with_state.pipe* 
 + *feed_daily_mv_with_state.pipe* 
@@ -121,20 +143,7 @@ LIMIT 10
 
 These Pipes apply SQL queries to data as it arrives and is *ingested*. For many use cases, processing data as it is ingested is much more efficient than processing data everytime a request arrives.  
 
-```sql
-SELECT
-    stock_symbol,
-    countState() AS total_events
-FROM stock_price_stream
-GROUP BY stock_symbol
-```
-
-```bash
-TYPE materialized
-DATASOURCE counts_mv
-ENGINE "AggregatingMergeTree"
-ENGINE_SORTING_KEY "stock_symbol"
-```
+Using `-State` operations, this query generates state snaphots of averages, minimums, and maximums as data arrives. 
 
 ```sql
  SELECT
@@ -148,6 +157,27 @@ FROM stock_price_stream
 GROUP BY symbol, timestamp
 ORDER BY symbol ASC, timestamp ASC
 ```
+### Data Sources for storing state data
+
++ *counts_mv.datasource* 
++ *daily_stats_mv.datasource* 
++ *hourly_stats_mv.datasource* 
+
+MV configuration details for the Data Source include:
+
+```bash
+TYPE materialized
+DATASOURCE daily_stats_mv
+ENGINE "AggregatingMergeTree"
+ENGINE_SORTING_KEY "stock_symbol"
+```
+### Requesting fresh data from MVs
+
++ *get_counts.pipe* 
++ *daily_stats.pipe* 
++ *hourly_stats.pipe* 
+
+When MV data is requested, data is pulled from the associated MV Data Source and the `-Merge` operations are applied: 
 
 ```sql
 SELECT timestamp, symbol, 
@@ -155,7 +185,7 @@ SELECT timestamp, symbol,
     minMerge(price_min) as price_min,
     maxMerge(price_max) as price_max,
     stddevPopMerge(price_stddev) AS price_stddev
-FROM hourly_stats_mv
+FROM daily_stats_mv
 GROUP BY timestamp, symbol
 ORDER BY symbol ASC, timestamp ASC
 ```
