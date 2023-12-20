@@ -145,6 +145,8 @@ These Pipes apply SQL queries to data as it arrives and is *ingested*. For many 
 
 Using `-State` operations, this query generates state snaphots of averages, minimums, and maximums as data arrives. 
 
+When creating a MV from this Pipe, it is configured to write to a named Data Source, `daily_stats_mv` in this case. See the next section for more details about 'special' setting needed to establish a MV. 
+
 ```sql
  SELECT
     stock_symbol AS symbol,
