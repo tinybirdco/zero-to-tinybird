@@ -15,7 +15,7 @@ So, most of the queries you build in Tinybird will have time details built into 
 Note:
 * The sooner you standardize on the UTC timezone for all things time, the better. Let the client display composer convert to local time if needed. If you are working with data generators, push the data already in UTC. For example, with Python, be sure to generate timestamps in UTC (`current_time = datetime.datetime.utcnow()`). 
 * ClickHouse provides a set of time functions that make working with time data easier. Like most data environments, ClickHouse supports both Date and DateTime objects. Check out [this ClickHouse guide](https://clickhouse.com/docs/en/sql-reference/functions/date-time-functions) for the details (tere is also this ClickHouse [blog post](https://clickhouse.com/blog/working-with-time-series-data-and-functions-ClickHouse). Functions such as [toStartOfDay](https://clickhouse.com/docs/en/sql-reference/functions/date-time-functions#tostartofmonth) are fantastic for binning and processing time-series data. If you have ever needed to bin time data in SQL, you will really appreciate these functions.
-* Tinybird servers are configured to store data in UTC. 
+* Your Tinybird will be configured to store data in UTC. 
   
 
 ### Data from the most recent hour
@@ -32,32 +32,63 @@ FROM stock_price_stream
 WHERE toDateTime(date) BETWEEN '2023-12-07 17:22:00' AND '2023-12-07 17:23:00'
 ```
 
-### Selecting most recent data within an explicit time window
+### Selecting most recent data 
 
-This query is hardcoded to 'look back' sixty minutes. 
+To detect timeouts, the most recent data point from each sensor is looked up. This sounds simple enough, and it is one of the most simple detection methods. Like many things, there is more than one way to look most recent data.    
+
+The following query sorts the data in reverse chronological order, and uses the `LIMIT BY` command to look up the most recent single (LIMIT 1) data for each sensor.
 
 ```sql
-%
+
+SELECT * 
+FROM incoming_data
+ORDER BY timestamp DESC
+LIMIT 1 BY id
+
+```
+
+Here is another SQL query for looking up the most recent data, which scans over partitions and also scans in reverse chronological order.  
+
+```sql
 WITH RankedData AS (
     SELECT
-        symbol,
-        date,
-        amount,
-        ROW_NUMBER() OVER (PARTITION BY symbol ORDER BY date DESC) AS row_num
+        id,
+        timestamp,
+        value,
+        ROW_NUMBER() OVER (PARTITION BY id ORDER BY timestamp DESC) AS row_num
     FROM
-        stock_price_stream
-     WHERE date > NOW() - INTERVAL 60 MINUTE
+        incoming_data
 )
 SELECT
-    symbol,
-    date,
-    amount
+    id,
+    timestamp,
+    value
 FROM
     RankedData
 WHERE
     row_num = 1
-
 ```
+
+These queries do not narrow down the time range of interest. With anomaly detection and real-time data, we typically have a set of *time windows* of interest. In general, our time range of interest ranged from data from the most recent 10 seconds, to generating statistics over the previous third minutes.
+
+If you have a data source with sensors that normally report every few seconds, it's likely that going ten seconds without a new report is a sign that a sensor is off-line. 
+
+To focus only on the last ten seconds of data the following WHERE clause can be added to each query (inside the inner RankedData query for the second example). 
+
+```sql
+WHERE timestamp > NOW() - INTERVAL 10 SECOND
+```
+
+When it comes to *timeout* anomalies, we wanted a system that would detect if a sensor stopped reporting in the past minute. Our data source emits data every few seconds for each sensor, so we started off with a system that would identify sensors that had not reported in the last minute. 
+
+We also wanted to provide an API Endpoint for ad hoc timeout checks that supported the following query parameters:
+
+* seconds - The 'timeout' duration in seconds. How many seconds since a sensor reporting gets you worried? 
+* time_window_minutes - How many minutes to 'look back' from 'now'.
+* sensor_id - Test on a sensor-by-sensor basis.
+
+This [example Pipe file](https://github.com/tinybirdco/anomaly-detection/blob/main/data-project/pipes/timeout.pipe) illustrates how to build these dynamic parameters into the queries. 
+
 
 ## JOIN patterns
 
