@@ -69,7 +69,9 @@ WHERE
     row_num = 1
 ```
 
-These queries do not narrow down the time range of interest. With anomaly detection and real-time data, we typically have a set of *time windows* of interest. In general, our time range of interest ranged from data from the most recent 10 seconds, to generating statistics over the previous third minutes.
+These queries do not narrow down the time range of interest. With anomaly detection and real-time data, we typically have a set of *time windows* of interest. In general, our time range of interest ranged from data from the most recent 10 seconds, to generating statistics over the previous thirty minutes.
+
+### Scanning periods of interext
 
 If you have a data source with sensors that normally report every few seconds, it's likely that going ten seconds without a new report is a sign that a sensor is off-line. 
 
@@ -83,9 +85,9 @@ When it comes to *timeout* anomalies, we wanted a system that would detect if a 
 
 We also wanted to provide an API Endpoint for ad hoc timeout checks that supported the following query parameters:
 
-* seconds - The 'timeout' duration in seconds. How many seconds since a sensor reporting gets you worried? 
-* time_window_minutes - How many minutes to 'look back' from 'now'.
-* sensor_id - Test on a sensor-by-sensor basis.
+* **seconds** - The 'timeout' duration in seconds. How many seconds since a sensor reporting gets you worried? 
+* **time_window_minutes** - How many minutes to 'look back' from 'now'.
+* **sensor_id** - Test on a sensor-by-sensor basis.
 
 This [example Pipe file](https://github.com/tinybirdco/anomaly-detection/blob/main/data-project/pipes/timeout.pipe) illustrates how to build these dynamic parameters into the queries. 
 
