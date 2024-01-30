@@ -27,11 +27,7 @@ load_dotenv(dotenv_path)
 with open('./settings.yaml') as file:
     config = yaml.safe_load(file) # Includes a set of Sensor presets/overrides.  
 
-num_sensors = config['num_sensors']
 sleep_seconds = config['sleep_seconds']
-
-# A form of batching and throttling 'send' requests. 
-post_batch_size = config['post_batch_size']
 
 # Rather than using `While True`, here we run a given number of cycles and then stop. 
 num_iterations = config['num_iterations']
@@ -90,6 +86,7 @@ class Sensor:
         self.previous_value = value
 
         if value < 0:
+            print(f"Oops, company with ID:{self.id} has become a penny stock...")
             value = 0.01
 
         return value
@@ -253,13 +250,14 @@ def update_with_previous_value(sensors):
 def generate():
     
     # Create sensor objects.
-    print(f"Creating {num_sensors} sensors.")
     sensors = []
     reports = []
     # Create an array of objects, seeding with a auto-incrementing integer ID. 
 
     sensors = generate_sensors(COMPANY_INFO, sensors)
 
+    print(f"Created {len(sensors)} sensors.")
+    
     sensors = sensor_presets(sensors, config)
 
     sensors = update_with_previous_value(sensors)
@@ -283,8 +281,7 @@ def generate():
             #    print(f"Sensor {sensor.symbol}: {report}")
 
         # [] TODO - update to also send via Kafka stream. 
-        if batched_reports >= post_batch_size:
-            print(f"Reached batch size of {post_batch_size} events with {batched_reports} events.")
+        if batched_reports >= len(sensors):
             print(f"Publishing {len(reports)} events to Kafka stream...")
 
             # TODO: Add error handling... 
