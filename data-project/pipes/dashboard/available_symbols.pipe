@@ -1,0 +1,8 @@
+TOKEN "available_symbols_read" READ
+
+NODE endpoint
+SQL >
+
+    SELECT DISTINCT symbol
+    FROM company_info
+    ORDER BY symbol ASC
