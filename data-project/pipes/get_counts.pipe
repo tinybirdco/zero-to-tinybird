@@ -1,8 +1,0 @@
-NODE untitled_pipe_9728_0
-SQL >
-
-    SELECT stock_symbol, countMerge(total_events) 
-    FROM counts_mv
-    GROUP BY stock_symbol
-
-
