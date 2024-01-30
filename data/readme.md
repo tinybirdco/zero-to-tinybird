@@ -16,7 +16,7 @@ curl \
 
 # Setting up stream of mock stock price data
 
-`stock-price-stream.py` is used to generate an event stream of mock stock price data. It reads in the content of the `company-info.csv` file and creates a *sensor object* for each company, including a three-character stock symbol. This script then generates new prices for each object and publishes them to a Kafka stream hosted on Confluent Cloud. 
+`stock-price-stream.py` is used to generate an event stream of mock stock price data. It reads in the content of the `company-info.csv` file and creates a *sensor object* for each company, including a three-character stock symbol. This script then generates new prices for each object and publishes them to a Kafka stream hosted on Confluent Cloud. To publish the data, you will need a Confluence Cloud account and a Kafka stream and topic configured. 
 
 Script configuration includes what interval to run on, with a default of publishing new prices every 20 seconds. 
 
