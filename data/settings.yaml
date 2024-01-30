@@ -1,0 +1,347 @@
+num_sensors: 83
+post_batch_size: 83
+sleep_seconds: 20                    #How long to pause between sensor value updates... 
+num_iterations: 1000000
+
+# We have 'normal' changes, and some precentage of larger 'step' changes.
+value_max_normal_change: 2 
+
+percent_step: 2
+percent_step_trend: 2
+
+step_change_min: 3
+step_change_max: 6
+
+sensor_overrides:
+  - symbol: ALG
+    trend: 'None'
+    initial_value: 145
+    outliers: False
+  - symbol: BCP
+    trend: 'None'
+    initial_value: 90
+    outliers: False
+  - symbol: BLP
+    trend: 'down'
+    initial_value: 68
+    outliers: False
+  - symbol: CCS
+    trend: 'None'
+    initial_value: 196
+    outliers: False
+  - symbol: CNS
+    trend: 'None'
+    initial_value: 53
+    outliers: False
+  - symbol: COM
+    trend: 'None'
+    initial_value: 21
+    outliers: False
+  - symbol: CPC
+    trend: 'None'
+    initial_value: 155
+    outliers: False
+  - symbol: CTC
+    trend: 'None'
+    initial_value: 99
+    outliers: False
+  - symbol: DYO
+    trend: 'down'
+    initial_value: 84
+    outliers: False
+  - symbol: ECC
+    trend: 'up'
+    initial_value: 133
+    outliers: False
+  - symbol: EGD
+    trend: 'None'
+    initial_value: 75
+    outliers: False
+  - symbol: EGI
+    trend: 'None'
+    initial_value: 173
+    outliers: False
+  - symbol: EGT
+    trend: 'None'
+    initial_value: 71
+    outliers: False
+  - symbol: EGY
+    trend: 'None'
+    initial_value: 72
+    outliers: False
+  - symbol: ELE
+    trend: 'None'
+    initial_value: 180
+    outliers: False
+  - symbol: ENE
+    trend: 'up'
+    initial_value: 41
+    outliers: False
+  - symbol: ENI
+    trend: 'None'
+    initial_value: 149
+    outliers: False
+  - symbol: EVE
+    trend: 'None'
+    initial_value: 48
+    outliers: False
+  - symbol: FFF
+    trend: 'None'
+    initial_value: 94
+    outliers: False
+  - symbol: FFL
+    trend: 'down'
+    initial_value: 24
+    outliers: False
+  - symbol: FIN
+    trend: 'up'
+    initial_value: 46
+    outliers: False
+  - symbol: FLR
+    trend: 'up'
+    initial_value: 158
+    outliers: False
+  - symbol: FLS
+    trend: 'None'
+    initial_value: 197
+    outliers: False
+  - symbol: FTS
+    trend: 'down'
+    initial_value: 28
+    outliers: False
+  - symbol: GNS
+    trend: 'None'
+    initial_value: 147
+    outliers: False
+  - symbol: GRG
+    trend: 'None'
+    initial_value: 162
+    outliers: False
+  - symbol: GTS
+    trend: 'None'
+    initial_value: 29
+    outliers: False
+  - symbol: HEA
+    trend: 'None'
+    initial_value: 155
+    outliers: False
+  - symbol: HED
+    trend: 'None'
+    initial_value: 130
+    outliers: False
+  - symbol: HHH
+    trend: 'None'
+    initial_value: 137
+    outliers: False
+  - symbol: HHL
+    trend: 'None'
+    initial_value: 186
+    outliers: False
+  - symbol: HXH
+    trend: 'up'
+    initial_value: 71
+    outliers: False
+  - symbol: LCP
+    trend: 'None'
+    initial_value: 194
+    outliers: False
+  - symbol: LIL
+    trend: 'None'
+    initial_value: 191
+    outliers: False
+  - symbol: LIN
+    trend: 'down'
+    initial_value: 142
+    outliers: False
+  - symbol: LLL
+    trend: 'None'
+    initial_value: 52
+    outliers: False
+  - symbol: LTS
+    trend: 'None'
+    initial_value: 31
+    outliers: False
+  - symbol: MAN
+    trend: 'None'
+    initial_value: 159
+    outliers: False
+  - symbol: MCD
+    trend: 'up'
+    initial_value: 198
+    outliers: False
+  - symbol: MED
+    trend: 'None'
+    initial_value: 179
+    outliers: False
+  - symbol: MGT
+    trend: 'None'
+    initial_value: 48
+    outliers: False
+  - symbol: MHI
+    trend: 'None'
+    initial_value: 100
+    outliers: False
+  - symbol: MNU
+    trend: 'None'
+    initial_value: 167
+    outliers: False
+  - symbol: MVI
+    trend: 'None'
+    initial_value: 67
+    outliers: False
+  - symbol: NEX
+    trend: 'None'
+    initial_value: 165
+    outliers: False
+  - symbol: NRG
+    trend: 'down'
+    initial_value: 3
+    outliers: False
+  - symbol: NTI
+    trend: 'None'
+    initial_value: 146
+    outliers: False
+  - symbol: NVI
+    trend: 'None'
+    initial_value: 87
+    outliers: False
+  - symbol: NVL
+    trend: 'up'
+    initial_value: 117
+    outliers: False
+  - symbol: NVW
+    trend: 'None'
+    initial_value: 18
+    outliers: False
+  - symbol: OMC
+    trend: 'None'
+    initial_value: 13
+    outliers: False
+  - symbol: OMD
+    trend: 'up'
+    initial_value: 156
+    outliers: False
+  - symbol: PRT
+    trend: 'up'
+    initial_value: 74
+    outliers: False
+  - symbol: PSL
+    trend: 'None'
+    initial_value: 113
+    outliers: False
+  - symbol: PWR
+    trend: 'None'
+    initial_value: 53
+    outliers: False
+  - symbol: QQI
+    trend: 'None'
+    initial_value: 179
+    outliers: False
+  - symbol: SER
+    trend: 'None'
+    initial_value: 87
+    outliers: False
+  - symbol: SMA
+    trend: 'down'
+    initial_value: 56
+    outliers: False
+  - symbol: SPH
+    trend: 'None'
+    initial_value: 13
+    outliers: False
+  - symbol: SSL
+    trend: 'None'
+    initial_value: 148
+    outliers: False
+  - symbol: SSS
+    trend: 'None'
+    initial_value: 188
+    outliers: False
+  - symbol: STS
+    trend: 'None'
+    initial_value: 109
+    outliers: False
+  - symbol: SUN
+    trend: 'None'
+    initial_value: 148
+    outliers: False
+  - symbol: SYS
+    trend: 'None'
+    initial_value: 72
+    outliers: False
+  - symbol: TEC
+    trend: 'up'
+    initial_value: 143
+    outliers: False
+  - symbol: TEK
+    trend: 'None'
+    initial_value: 163
+    outliers: False
+  - symbol: TEL
+    trend: 'None'
+    initial_value: 183
+    outliers: False
+  - symbol: TGI
+    trend: 'None'
+    initial_value: 23
+    outliers: False
+  - symbol: TGM
+    trend: 'None'
+    initial_value: 82
+    outliers: False
+  - symbol: TKT
+    trend: 'None'
+    initial_value: 194
+    outliers: False
+  - symbol: TRA
+    trend: 'None'
+    initial_value: 10
+    outliers: False
+  - symbol: TRE
+    trend: 'down'
+    initial_value: 186
+    outliers: False
+  - symbol: TST
+    trend: 'None'
+    initial_value: 5
+    outliers: False
+  - symbol: TTC
+    trend: 'up'
+    initial_value: 178
+    outliers: False
+  - symbol: TTI
+    trend: 'None'
+    initial_value: 187
+    outliers: False
+  - symbol: TTM
+    trend: 'None'
+    initial_value: 16
+    outliers: False
+  - symbol: UTI
+    trend: 'None'
+    initial_value: 148
+    outliers: False
+  - symbol: UTO
+    trend: 'None'
+    initial_value: 127
+    outliers: False
+  - symbol: VTC
+    trend: 'down'
+    initial_value: 164
+    outliers: False
+  - symbol: WAV
+    trend: 'None'
+    initial_value: 89
+    outliers: False
+  - symbol: WLI
+    trend: 'up'
+    initial_value: 126
+    outliers: False
+  - symbol: WTI
+    trend: 'None'
+    initial_value: 20
+    outliers: False
+  - symbol: WWT
+    trend: 'None'
+    initial_value: 57
+    outliers: False
