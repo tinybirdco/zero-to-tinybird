@@ -1,7 +1,5 @@
-num_sensors: 83
-post_batch_size: 83
-sleep_seconds: 20                    #How long to pause between sensor value updates... 
-num_iterations: 1000000
+sleep_seconds: 20        # How long to pause between sensor value updates... 
+num_iterations: 1000000  # A guard rail for only running so long. With this number (and this interval) it will run for many weeks. 
 
 # We have 'normal' changes, and some precentage of larger 'step' changes.
 value_max_normal_change: 2 
