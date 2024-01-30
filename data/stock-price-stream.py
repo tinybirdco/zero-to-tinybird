@@ -40,8 +40,8 @@ num_iterations = config['num_iterations']
 value_max_normal_change = config['value_max_normal_change']
 
 # Set some boundaries for the step amounts... 
-change_max = config['change_max']
-change_min = config['change_min']
+step_change_max = config['step_change_max']
+step_change_min = config['step_change_min']
 percent_step = config['percent_step']
 percent_step_trend = config['percent_step_trend']
 
@@ -67,23 +67,30 @@ class Sensor:
     def generate_new_value(self):
 
         value = self.value
-        change = 0
+        change = random.uniform(-value_max_normal_change,value_max_normal_change)
         
         # For some small percentage, generate a step change
         step_control = random.uniform(0,100)
-        change_amount = random.uniform(change_min, change_max)
-        if step_control < percent_step and self.trend == None:
-            change = random.choice([-1,1]) * change_amount
-        elif step_control < percent_step_trend and self.trend != None:
-            if self.trend == 'up':
-                change = change_amount
+
+        if (step_control < percent_step) or (step_control < percent_step_trend):
+            # OK, we are inserting a 'step' change
+            step_change = random.uniform(step_change_min, step_change_max)
+
+            if self.trend == 'None':
+                change = random.choice([-1,1]) * step_change
+            elif self.trend == 'up':
+                change = step_change
             elif self.trend == 'down':
-                change = -change_amount
-        else:    
-            change = random.uniform(-value_max_normal_change,value_max_normal_change)
+                change = -step_change
+            else:
+                pass
+           
             
         value = value + change
         self.previous_value = value
+
+        if value < 0:
+            value = 0.01
 
         return value
 
@@ -272,8 +279,8 @@ def generate():
             reports.append(report)
             batched_reports = batched_reports + 1
 
-            if sensor.id == 1:
-                print(f"Sensor {sensor.symbol}: {report}")
+            #if sensor.id == 1:
+            #    print(f"Sensor {sensor.symbol}: {report}")
 
         # [] TODO - update to also send via Kafka stream. 
         if batched_reports >= post_batch_size:
