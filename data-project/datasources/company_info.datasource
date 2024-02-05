@@ -3,8 +3,8 @@ SCHEMA >
     `symbol` String,
     `name` String,
     `creation_date` Date,
-    `sector` String
+    `sector` LowCardinality(String)
 
 ENGINE "MergeTree"
 ENGINE_PARTITION_KEY "toYear(creation_date)"
-ENGINE_SORTING_KEY "creation_date, sector, name, symbol"
+ENGINE_SORTING_KEY "creation_date, symbol, name"

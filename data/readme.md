@@ -14,21 +14,22 @@ curl \
 -X POST "https://api.tinybird.co/v0/datasources?name=company_info" \
 -d url='https://raw.githubusercontent.com/jimmoffitt/zero-to-tinybird/main/data/stock-symbols.csv'
 
-# Creating a real-time event stream of mocked data
+# Setting up stream of mock stock price data
 
-* Head to https://mockingbird.tinybird.co/ and configure the details after selecting `Tinybird Events API`. 
-  * Be sure to select the `Host` that matches where your Workspace resides. 
-  * Copy in your admin Auth Token associated with your email.
-  * Set the `Events Per Second` setting to something between 10 and 100.
-* In the `Schema Designer` section, copy in the contents provided in the [stock-price-stream.mockingbird](https://raw.githubusercontent.com/tinybirdco/zero-to-tinybird/main/data/stock-price-stream.mockingbird?token=GHSAT0AAAAAACBNU2HUVJP6MGXCXH4KCWH4ZL4Y3KA) file. This JSON object describes the data structure of streamed event data. The defined stock symbols match what is in the `company-info.csv` file.
-* Click on the `Preview` button and confirm that the schema is set-up OK. You should see something like:
-```json
-{
-    "amount": 0.5859901180956513,
-    "date": "2023-12-15T20:38:55",
-    "stock_symbol": "NEX"
-}
-```
-* Click the 'Start Generating!` button to start the event stream. 
-* Return to your Tinybird Workspace and confirm that data is arriving. It may take a few seconds to see the updates. 
+`stock-price-stream.py` is used to generate an event stream of mock stock price data. It reads in the content of the `company-info.csv` file and creates a *sensor object* for each company, including a three-character stock symbol. This script then generates new prices for each object and publishes them to a Kafka stream hosted on Confluent Cloud. To publish the data, you will need a Confluence Cloud account and a Kafka stream and topic configured. 
+
+Script configuration includes what interval to run on, with a default of publishing new prices every 20 seconds. 
+
+The script has logic to 'manage' the time-series values, and supports both 'normal' changes between reports and larger 'step' changes. If the Tinybird Workspace receiving the data has a `most_recent` API Endpoint, on start-up, the script will retrieve these values and initiate the sensors with those. 
+
+Script configuration is provided by the `settings.yaml` file, and includes the interval setting (in seconds) and setting to *tune* the change patterns in the generated time-series data.    
+
+
+
+ 
+
+
+
+
+
 

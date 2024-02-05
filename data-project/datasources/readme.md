@@ -1,7 +1,7 @@
 # Data Sources
 
 Workshop content is based on these two data sources:
-* A real-time stream of stock price updates. 
+* A real-time stream of (mocked) stock price updates. 
 * *Dimensional* metadata about the stock symbols, such as company names, economic sectors, and creation dates. 
 
 
@@ -20,9 +20,9 @@ See [HERE](https://github.com/tinybirdco/zero-to-tinybird/blob/main/data/readme.
 ## Real-time stream of events  
 
 ```bash
-  `amount` Float32 `json:$.amount`,
-  `date` DateTime `json:$.date`,
-  `stock_symbol` String `json:$.stock_symbol`
+  `timestamp` DateTime `json:$.date`,
+  `symbol` String `json:$.stock_symbol`,
+  `price` Float32 `json:$.amount`
 ```
 
 ## Materialized Views
@@ -32,7 +32,7 @@ ENGINE "AggregatingMergeTree"
 ```
 
 ```bash
-  `stock_symbol` String,
+  `symbol` String,
   `total_events` AggregateFunction(count)
 ```
 

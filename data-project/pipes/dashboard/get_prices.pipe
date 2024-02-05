@@ -1,0 +1,31 @@
+TOKEN "get_prices_read" READ
+
+NODE endpoint
+SQL >
+
+    %
+
+    SELECT timestamp, symbol, price
+    FROM event_stream
+    WHERE 1=1 
+      {% if defined(stock_symbol) %}
+         AND symbol = {{ String(stock_symbol,description='Company stock symbol to return.')}}
+      {% end %}
+      AND timestamp BETWEEN addDays(now(),-1) AND now()
+    ORDER BY timestamp DESC
+    LIMIT {{ Int32(max_results, 1000, description="The maximum number of data objects to return per response.") }}
+
+
+
+
+NODE test
+SQL >
+
+    %
+    SELECT timestamp, symbol, price
+    FROM event_stream
+    WHERE symbol = 'ALG'
+      AND timestamp BETWEEN addDays(NOW(),-1) AND NOW()
+    ORDER BY timestamp ASC
+    LIMIT 1000
+

@@ -1,4 +1,4 @@
-# Data Source created from Pipe 'feed_hourly_mv_with_state'
+# Data Source created from Pipe 'feed_hourly_mv'
 
 SCHEMA >
     `symbol` String,

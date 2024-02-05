@@ -1,0 +1,20 @@
+NODE create_mv_with_state
+SQL >
+
+    SELECT
+        symbol,
+        toStartOfHour(timestamp) AS timestamp,
+        avgState(price) AS price_avg,
+        minState(price) AS price_min,
+        maxState(price) AS price_max,
+        stddevPopState(price) AS price_stddev
+    FROM event_stream
+    GROUP BY
+        symbol,
+        timestamp
+
+TYPE materialized
+DATASOURCE hourly_stats_mv
+ENGINE "AggregatingMergeTree"
+ENGINE_PARTITION_KEY "toYear(timestamp)"
+ENGINE_SORTING_KEY "timestamp, symbol"

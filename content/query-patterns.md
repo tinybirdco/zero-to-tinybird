@@ -91,6 +91,38 @@ We also wanted to provide an API Endpoint for ad hoc timeout checks that support
 
 This [example Pipe file](https://github.com/tinybirdco/anomaly-detection/blob/main/data-project/pipes/timeout.pipe) illustrates how to build these dynamic parameters into the queries. 
 
+### Providing flexible query parameters
+
+Tinybird provides a *templating* syntax for building *dynamic* query parameters into your Tinybird API Endpoints. As you design your API endpoints, it is important to consider how your users will want to specify important attributes of the objects your API is serving. 
+
+When it comes to time, users typically want to pick a time *period* of interest, defined by start and end times. Four common modes for time requests include having the following start and end times provided:
+
++ Both start and end times. The user has specific time period of interest, and typically uses a second resolution. 
++ No start and end times. The most recent data is usually implied and it's up to the server to enforce limits. This usually means declaring a maximum duration to server, e.g. the last day, week, or month. Some maximum number of objects to return is recommended. 
++ Only start time. The user has a specific beginning time in mind, the beginning of some event of interest. 
++ Only end time. The user has a specific end of an event in mind, and wants data leading up to it. 
+
+Here is a example template for providing these time request conventions. Here we support the convention of serving a maximum of 30 days if the user does not specify a start or end time. 
+
+```sql
+{% if defined(start_time) and defined(end_time) %}
+   AND toDateTime(timestamp) BETWEEN parseDateTimeBestEffort({{ DateTime(start_time, description="'YYYY-MM-DD HH:mm:ss'. UTC. Optional and defaults to 30 days ago. Defines the start of the period of interest. ") }}) AND parseDateTimeBestEffort({{ DateTime(end_time, description="'YYYY-MM-DD HH:mm:ss'. UTC. Optional and defaults to time of request. Defines the end of the period of interest.") }})
+{% end %}
+
+{% if not defined(start_time) and not defined(end_time) %}
+   AND toDateTime(timestamp) BETWEEN addDays(now(),-30) AND now()
+{% end %}
+
+{% if defined(start_time) and not defined(end_time) %}
+   AND toDateTime(timestamp) BETWEEN parseDateTimeBestEffort({{ DateTime(start_time) }}) AND addDays(toDateTime(parseDateTimeBestEffort({{DateTime(start_time)}}),30)
+{% end %}
+
+{% if not defined(start_time) and defined(end_time) %}
+   AND toDateTime(timestamp) BETWEEN addDays(toDateTime(parseDateTimeBestEffort({{DateTime(end_time)}}),-30) AND parseDateTimeBestEffort({{ DateTime(end_time) }})
+{% end %}
+```
+
+p.s. Always use UTC. 
 
 ## JOIN patterns
 
