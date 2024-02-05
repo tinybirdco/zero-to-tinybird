@@ -18,6 +18,32 @@ This repository includes resources to help attendees find documentation and othe
 * A free Tinybird account. Navigate to [tinybird.co/signup](https://www.tinybird.co/signup) and create a free account. Create a new Workspace (name it whatever you want).
 * Basic knowledge of SQL, querying concepts, and the fundamentals of API endpoint design.
 
+## What are we building? 
+
+For the workshop project we will start off with two data sources:
+* A live stream of stock prices for a set of ~80 mock companies. These prices are reported every few seconds and published on a Kafka-based stream hosted on Confluent Cloud. This project includes the Python script used to generate the real-time data stream.  See below for visual examples of what it generates.  This data stream has this concise data schema:
+```
+`id` Int16 
+`price` Float32 
+`symbol` String 
+`timestamp` DateTime 
+```
+ 
+* A 'dimensional' (or 'fact') table containing metadata for a set of ~80 companies, including their full name, creation date, sector, and stock symbol.
+
+```
+`symbol` String
+`name` String
+`creation_date` Date
+`sector` LowCardinality(String)
+```
+
+Our intial **Tinybird data flow** will look like this: 
+
+![Data flow diagram](images/data-flow-2.0.1.png)
+
+Here we have the two *Data Sources*, and three data 'pipelines' based on them. These Tinybird *Pipes* illustrate fundamental SQL transformations: filtering, aggregating, and joining data sources. 
+
 ## Section details
 
 ### Tinybird overview
