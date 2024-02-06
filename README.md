@@ -18,6 +18,13 @@ This repository includes resources to help attendees find documentation and othe
 * A free Tinybird account. Navigate to [tinybird.co/signup](https://www.tinybird.co/signup) and create a free account. Create a new Workspace (name it whatever you want).
 * Basic knowledge of SQL, querying concepts, and the fundamentals of API endpoint design.
 
+## Other resources:
+
+* Snapshots of example content:
+  * [Project with two Data Sources and three Pipes](https://github.com/jimmoffitt/z2t_next_2)
+  * [`add_mv` Git branch with updates related to creating a Materialized View](https://github.com/jimmoffitt/z2t_next_2/tree/add_mv)
+
+
 ## What are we building? 
 
 For the workshop project we will start off and building on two data sources:
@@ -35,6 +42,46 @@ Our intial **Tinybird data flow** will look like this:
 ![Data flow diagram](images/data-flow-2.0.1.png)
 
 Here we have the two *Data Sources*, and three data 'pipelines' based on them. These Tinybird *Pipes* illustrate fundamental SQL transformations: filtering, aggregating, and joining data sources. 
+
+
+## What topics will we be covering? 
+
+* Creating Data Sources
+  * Introduction to native connectors: Kafka/Confluent streams, AWS S3, BigQuery, and Snowflake.
+  * Importing dimensional/fact tables. 
+  * Connecting to a Confluent stream of real-time (mocked) stock prices. 
+
+    [See more here.](/content/sections/creating-data-sources.md)
+
+
+* Building data analysis pipelines
+  * Getting started by developing SQL queries in Playgrounds.
+  * Building our first Pipe and publishing an API Endpoint.
+  * Building Pipes that filter, aggregate and join Data Sources.
+  * Creating dynamic request parameters.   
+
+    [See more here.](/content/sections/building-pipelines.md)
+
+* Introduction to Materialized Views
+    * Purpose and example use cases.
+    * Improving performace by filtering and aggregating at ingest time, not query time. 
+    * Temporal rollups.
+    * State/Merge functions. 
+
+    [See more here.](/content/sections/materialized-views.md)
+
+* Introduction to the Tinybird CLI
+  * Installing the CLI.
+  * Exploring our Workspace with the CLI.
+  * Touring available commands and preparing for managing projects under version control.
+
+    [See more here.](/content/sections/intro-to-cli.md)
+
+* Using version control with data projects
+  * Read our blog post describing [why we built version control features into Tinybird](https://www.tinybird.co/blog-posts/version-control-for-real-time-data). 
+
+    
+    [See more here.](/content/sections/version-control.md)
 
 
 

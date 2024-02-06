@@ -129,18 +129,18 @@ p.s. Always use UTC.
 Tinybird is built to help users unify their data sources. Our users want to combine their data sources in Tinybird so they can blend it all into their analysis and output. One of the most fundamental use cases for Tinybird is *enriching real-time data* with dimensional data. This is all made possible by *joining* the data. When you *JOIN* data in SQL you are linking, mapping, and associating common data attributes from two or more sources. 
 
 ```sql
-SELECT sps.date, ci.symbol, ci.name, sps.amount 
-FROM company_info ci, stock_price_stream sps
-WHERE ci.symbol = sps.stock_symbol
-LIMIT 10
+SELECT es.timestamp, ci.symbol, es.price, ci.name, ci.sector
+FROM company_info ci, event_stream es
+WHERE ci.symbol = sps.symbol
+LIMIT 100
 ```
 
 ```sql
-SELECT sps.date, ci.symbol, ci.name, sps.amount 
+SELECT es.timestamp, ci.symbol, es.price, ci.name, ci.sector
 FROM company_info ci
-JOIN stock_price_stream sps
-ON ci.symbol = sps.stock_symbol
-LIMIT 10
+JOIN event_stream es
+ON ci.symbol = es.symbol
+LIMIT 100
 ```
 
 ## Calculating slope

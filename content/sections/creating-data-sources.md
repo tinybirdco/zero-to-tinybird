@@ -1,8 +1,21 @@
 ### Creating Data Sources
-  * Introduction to native connectors: Kafka/Confluent streams, AWS S3, BigQuery, and Snowflake.
-  * Importing dimensional/fact tables. 
-  * Connecting to a Confluent stream of real-time (mocked) stock prices. 
- 
+
+Screencasts:
+
+* [Ingest data from a file](https://youtu.be/1R0G1EolSEM)
+* [Generate mock data streams for your next data project]()
+* [Stream data using the Events API]()
+* [Sync BigQuery tables to Tinybird]()
+* [Edit a Data Source schema with the CLI](https://youtu.be/gzpuQfk3Byg)
+* [Sync files from S3 into Tinybird](https://youtu.be/JIo50NGc-BA)
+
+Documentation:
+
+* [Core concept](https://www.tinybird.co/docs/main-concepts.html#data-sources)
+* [Data Sources API](https://www.tinybird.co/docs/ingest/datasource-api.html)
+* [Events API](https://www.tinybird.co/docs/ingest/events-api.html)
+
+
 * The `event_stream` data stream has this concise data schema:
 
 ```
