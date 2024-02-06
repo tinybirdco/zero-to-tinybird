@@ -26,6 +26,26 @@ Script configuration is provided by the `settings.yaml` file, and includes the i
 
 ![Example](../images/com.com.png)
 
+The `stock-price-stream.py` script imports configuration details from a local `settings.yaml` file. 
+
+These settings help *tune* time-series patterns:
+
+```yaml
+sleep_seconds: 20    # How long to pause between sensor value updates... 
+num_iterations: 1000000 # A guard rail for only running so long. With this number (and this interval) it will run for many weeks. 
+
+# We have 'normal' changes, and some precentage of larger 'step' changes.
+value_max_normal_change: 1 
+
+percent_step: 2
+percent_step_trend: 2
+
+step_change_min: 3
+step_change_max: 6
+```
+
+This script is a simplified version of a data generator used to create time-series with prescribed anomalies. 
+
 
 
 
