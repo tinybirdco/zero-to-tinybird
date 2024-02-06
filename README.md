@@ -13,7 +13,6 @@ This repository includes resources to help attendees find documentation and othe
 * Introduction to the Tinybird CLI
 * Using version control with data projects
 
-
 ## Prerequisites
 
 * A free Tinybird account. Navigate to [tinybird.co/signup](https://www.tinybird.co/signup) and create a free account. Create a new Workspace (name it whatever you want).
@@ -23,11 +22,11 @@ This repository includes resources to help attendees find documentation and othe
 
 For the workshop project we will start off and building on two data sources:
 
-A `company_info` dimensional table with company metadata, including full name, creation date, economic sector, and stock symbol.
+* `company_info` dimensional table with company metadata, including full name, creation date, economic sector, and stock symbol.
 
-* A `event_stream` live stream of stock prices for a set of ~80 mock companies. These prices are reported every few seconds and published on a Kafka-based stream hosted on Confluent Cloud. 
+* `event_stream` live stream of stock prices for a set of ~80 mock companies. These prices are reported every few seconds and published on a Kafka-based stream hosted on Confluent Cloud. 
 
-![Here is an example time-series](images/alg.com.png)
+![Here is an example time-series](images/com.com.png)
 
 This project includes the Python script used to generate the real-time data stream.  
 
@@ -38,7 +37,6 @@ Our intial **Tinybird data flow** will look like this:
 Here we have the two *Data Sources*, and three data 'pipelines' based on them. These Tinybird *Pipes* illustrate fundamental SQL transformations: filtering, aggregating, and joining data sources. 
 
 ## Section details
-
 
 ### Creating Data Sources
   * Introduction to native connectors: Kafka/Confluent streams, AWS S3, BigQuery, and Snowflake.
@@ -69,7 +67,7 @@ This data stream has this concise data schema:
 ```
 
 
-### Materialized Views
+### An introduction to Materialized Views
   * Purpose and example use cases.
     * Filtering and aggregating at ingest time, not query time. Temporal rollups.
   * State/Merge functions. 
@@ -79,6 +77,6 @@ This data stream has this concise data schema:
   * Exploring our Workspace with the CLI.
   * Touring available commands and preparing for managing projects under version control.
 
-### An introduction to Tinybird Versions
+### Using version control with data projects
   * The whys and hows of the Tinybird workflow with version control 
   * Demonstrating adding new features in a Branch and building a Release.
