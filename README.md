@@ -7,11 +7,11 @@ This repository includes resources to help attendees find documentation and othe
 ## Workshop sections
 
 * Tinybird overview
-* [Creating Data Sources](#creating-data-sources)
-* Building data analysis pipelines
-* Introduction to Materialized Views
-* Introduction to the Tinybird CLI
-* Using version control with data projects
+* [Creating Data Sources](/content/sections/creating-data-sources.md)
+* [Building data analysis pipelines](/content/sections/building-pipelines.md)
+* [Introduction to Materialized Views](/content/sections/materialized-views.md)
+* [Introduction to the Tinybird CLI](/content/sections/intro-to-cli.md)
+* [Using version control with data projects](/content/sections/version-control.md)
 
 ## Prerequisites
 
@@ -36,47 +36,10 @@ Our intial **Tinybird data flow** will look like this:
 
 Here we have the two *Data Sources*, and three data 'pipelines' based on them. These Tinybird *Pipes* illustrate fundamental SQL transformations: filtering, aggregating, and joining data sources. 
 
-## Section details
-
-### Creating Data Sources
-  * Introduction to native connectors: Kafka/Confluent streams, AWS S3, BigQuery, and Snowflake.
-  * Importing dimensional/fact tables. 
-  * Connecting to a Confluent stream of real-time (mocked) stock prices. 
- 
-### Building data analysis pipelines
-  * Getting started by developing SQL queries in Playgrounds.
-  * Building our first Pipe and publishing an API Endpoint.
-  * Building Pipes that filter, aggregate and join Data Sources.
-  * Creating dynamic request parameters.   
-
-This data stream has this concise data schema:
-```
-`id` Int16 
-`price` Float32 
-`symbol` String 
-`timestamp` DateTime 
-```
- 
-* A 'dimensional' (or 'fact') table containing metadata for a set of ~80 companies, including their full name, creation date, sector, and stock symbol.
-
-```
-`symbol` String
-`name` String
-`creation_date` Date
-`sector` LowCardinality(String)
-```
 
 
-### An introduction to Materialized Views
-  * Purpose and example use cases.
-    * Filtering and aggregating at ingest time, not query time. Temporal rollups.
-  * State/Merge functions. 
 
-### An introduction to the Tinybird CLI
-  * Installing the CLI.
-  * Exploring our Workspace with the CLI.
-  * Touring available commands and preparing for managing projects under version control.
 
-### Using version control with data projects
-  * The whys and hows of the Tinybird workflow with version control 
-  * Demonstrating adding new features in a Branch and building a Release.
+
+
+
