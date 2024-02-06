@@ -14,7 +14,7 @@ curl \
 -X POST "https://api.tinybird.co/v0/datasources?name=company_info" \
 -d url='https://raw.githubusercontent.com/jimmoffitt/zero-to-tinybird/main/data/stock-symbols.csv'
 
-# Setting up stream of mock stock price data
+# Setting up real-time stream of mock stock price data
 
 `stock-price-stream.py` is used to generate an event stream of mock stock price data. It reads in the content of the `company-info.csv` file and creates a *sensor object* for each company, including a three-character stock symbol. This script then generates new prices for each object and publishes them to a Kafka stream hosted on Confluent Cloud. To publish the data, you will need a Confluence Cloud account and a Kafka stream and topic configured. 
 
@@ -23,6 +23,9 @@ Script configuration includes what interval to run on, with a default of publish
 The script has logic to 'manage' the time-series values, and supports both 'normal' changes between reports and larger 'step' changes. If the Tinybird Workspace receiving the data has a `most_recent` API Endpoint, on start-up, the script will retrieve these values and initiate the sensors with those. 
 
 Script configuration is provided by the `settings.yaml` file, and includes the interval setting (in seconds) and setting to *tune* the change patterns in the generated time-series data.    
+
+![Example](../images/com.com.png)
+
 
 
 
