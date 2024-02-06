@@ -7,11 +7,12 @@ This repository includes resources to help attendees find documentation and othe
 ## Workshop sections
 
 * Tinybird overview
-* Creating Data Sources
+* [Creating Data Sources](#creating-data-sources)
 * Building data analysis pipelines
-* Materialized Views
-* An introduction to the Tinybird CLI
-* An introduction to Tinybird Versions
+* Introduction to Materialized Views
+* Introduction to the Tinybird CLI
+* Using version control with data projects
+
 
 ## Prerequisites
 
@@ -20,8 +21,37 @@ This repository includes resources to help attendees find documentation and othe
 
 ## What are we building? 
 
-For the workshop project we will start off with two data sources:
-* A live stream of stock prices for a set of ~80 mock companies. These prices are reported every few seconds and published on a Kafka-based stream hosted on Confluent Cloud. This project includes the Python script used to generate the real-time data stream.  See below for visual examples of what it generates.  This data stream has this concise data schema:
+For the workshop project we will start off and building on two data sources:
+
+A `company_info` dimensional table with company metadata, including full name, creation date, economic sector, and stock symbol.
+
+* A `event_stream` live stream of stock prices for a set of ~80 mock companies. These prices are reported every few seconds and published on a Kafka-based stream hosted on Confluent Cloud. 
+
+![Here is an example time-series](images/alg.com.png)
+
+This project includes the Python script used to generate the real-time data stream.  
+
+Our intial **Tinybird data flow** will look like this: 
+
+![Data flow diagram](images/data-flow-2.0.1.png)
+
+Here we have the two *Data Sources*, and three data 'pipelines' based on them. These Tinybird *Pipes* illustrate fundamental SQL transformations: filtering, aggregating, and joining data sources. 
+
+## Section details
+
+
+### Creating Data Sources
+  * Introduction to native connectors: Kafka/Confluent streams, AWS S3, BigQuery, and Snowflake.
+  * Importing dimensional/fact tables. 
+  * Connecting to a Confluent stream of real-time (mocked) stock prices. 
+ 
+### Building data analysis pipelines
+  * Getting started by developing SQL queries in Playgrounds.
+  * Building our first Pipe and publishing an API Endpoint.
+  * Building Pipes that filter, aggregate and join Data Sources.
+  * Creating dynamic request parameters.   
+
+This data stream has this concise data schema:
 ```
 `id` Int16 
 `price` Float32 
@@ -38,30 +68,6 @@ For the workshop project we will start off with two data sources:
 `sector` LowCardinality(String)
 ```
 
-Our intial **Tinybird data flow** will look like this: 
-
-![Data flow diagram](images/data-flow-2.0.1.png)
-
-Here we have the two *Data Sources*, and three data 'pipelines' based on them. These Tinybird *Pipes* illustrate fundamental SQL transformations: filtering, aggregating, and joining data sources. 
-
-## Section details
-
-### Tinybird overview
-  * What is Tinybird?
-  * Key Tinybird features. 
-  * Why use Tinybird? Benefits of using Tinybird to implement real-time architectures.
-  * Tinybird glossary of terms, establish a common nomenclature for discussing real-time data and event-driven architectures. 
-
-### Creating Data Sources
-  * Introduction to native connectors: Kafka/Confluent streams, AWS S3, BigQuery, and Snowflake.
-  * Importing dimensional/fact tables. 
-  * Connecting to a Confluent stream of real-time (mocked) stock prices. 
- 
-### Building data analysis pipelines
-  * Getting started by developing SQL queries in Playgrounds.
-  * Building our first Pipe and publishing an API Endpoint.
-  * Building Pipes that filter, aggregate and join Data Sources.
-  * Creating dynamic request parameters.   
 
 ### Materialized Views
   * Purpose and example use cases.
