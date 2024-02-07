@@ -5,4 +5,4 @@ SQL >
     FROM company_info ci, event_stream es
     WHERE ci.symbol = es.symbol
     ORDER BY timestamp DESC
-    LIMIT 10
+    LIMIT 100

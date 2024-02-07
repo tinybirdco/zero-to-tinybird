@@ -12,7 +12,7 @@ SQL >
       AND LOWER(symbol) = LOWER({{ String(company,description = 'String. Three-character symbol of interest.') }})
     {% end %}
     ORDER BY timestamp DESC
-    LIMIT {{ Int32(max_results,10,description="The maximum number of reports to return per response.") }}
+    LIMIT {{ Int32(max_results,100,description="The maximum number of reports to return per response.") }}
 
 
 

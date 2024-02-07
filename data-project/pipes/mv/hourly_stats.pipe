@@ -4,13 +4,13 @@ NODE merge_from_mv
 SQL >
 
     SELECT timestamp, symbol, 
-    avgMerge(price_avg) AS price_avg,
+    ROUND(avgMerge(price_avg),2) AS price_avg,
     minMerge(price_min) as price_min,
     maxMerge(price_max) as price_max,
-    stddevPopMerge(price_stddev) AS price_stddev
+    ROUND(stddevPopMerge(price_stddev),2) AS price_stddev
     FROM hourly_stats_mv
-    GROUP BY timestamp, symbol
-    ORDER BY symbol ASC, timestamp ASC
+    GROUP BY timestamp, symbol 
+    ORDER BY symbol ASC, timestamp DESC
 
 
 
@@ -21,14 +21,19 @@ SQL >
     SELECT * 
     FROM merge_from_mv
     WHERE 1=1
-    {% if defined(sym) %}               
-        AND symbol == {{ String(sym,description='description',required=False)}}
+    {% if defined(company) %}               
+        AND symbol == {{ String(company,description='description',required=False)}}
     {% end %}    
     ORDER BY timestamp DESC
 
 
 
 NODE filter_by_timestamp
+DESCRIPTION >
+    For testing:
+    {% set start_time = '2024-01-20 00:00:00' %}
+    {% set end_time = '2024-01-22 00:00:00' %}
+
 SQL >
 
     %
@@ -45,7 +50,7 @@ SQL >
          AND toDateTime(timestamp) BETWEEN parseDateTimeBestEffort({{ DateTime(start_time) }}) AND now()
      {% end %}
      {% if not defined(start_time) and defined(end_time) %}
-         AND toDateTime(timestamp) BETWEEN addDays(toDateTime(parseDateTimeBestEffort({{DateTime(end_time)}}),-7) AND parseDateTimeBestEffort({{ DateTime(end_time) }})
+         AND toDateTime(timestamp) BETWEEN addDays(toDateTime(parseDateTimeBestEffort({{DateTime(end_time)}})),-7) AND parseDateTimeBestEffort({{ DateTime(end_time) }})
      {% end %}
 
 
