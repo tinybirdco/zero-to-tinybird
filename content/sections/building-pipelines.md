@@ -1,4 +1,4 @@
-## Building data analysis pipelines
+# Building data analysis pipelines
 
 What we will do in this session: 
   * Getting started by developing SQL queries in Playgrounds.
@@ -17,46 +17,100 @@ Documentation:
   * [Nodes](https://www.tinybird.co/docs/main-concepts.html#nodes)
   * [API Endpoints](https://www.tinybird.co/docs/main-concepts.html#api-endpoints)
 * [Using Query parameters](https://www.tinybird.co/docs/query/query-parameters.html)
-* 
-
-## Example SQL 
 
 
-### Filtering by symbol 
+## Workshop SQL 
+
+### `filter` Pipe
+
+This Pipe will have a single Node, named `filter_by_symbol`.
+
+#### Starting query
 
 ```sql
 SELECT timestamp, symbol, price 
 FROM event_stream
-WHERE 
-symbol = 'ALG'
+WHERE symbol = 'ALG'
 ORDER BY timestamp DESC
 LIMIT 100
 ```
 
-### Generating hourly stats
+Next we introduce dynamic query parameters using the Tinybird templating syntax.
 
-This query uses the ClickHouse `toStartHour` to 'bin' the reports into hourly 'buckets'.
+* Adding `max_results` and `company` API endpoint query paramters.
+* Since WHERE cause is dependent on user providing that query parameter, we need to handle when there are no user-triggered WHERE clauses and start with a always true `WHERE 1=1` clause and AND onto that. 
+* Adding `LOWER()` statement to make query case insensitive. 
+
+#### Final query
+
+##### Single `filter_by_symbol` Node
 
 ```sql
- SELECT
-        toStartOfHour(timestamp) AS time,
-        symbol,
-        ROUND(avg(price), 2) AS price_avg,
-        ROUND(min(price), 2) AS price_min,
-        ROUND(max(price), 2) AS price_max
-    FROM event_stream
-    GROUP BY
-        symbol, time
-    ORDER BY
-        time DESC,
-        symbol ASC    
+%
+SELECT timestamp, symbol, price 
+FROM event_stream
+WHERE 
+1=1
+{% if defined(company) %}
+  AND LOWER(symbol) = LOWER({{ String(company,description = 'String. Three-character stock symbol of interest.') }})
+{% end %}
+ORDER BY timestamp DESC
+LIMIT {{ Int32(max_results,10,description="The maximum number of reports to return per response.") }}
 ```
 
-### Queries that JOIN two Data Sources
+### `aggregate` Pipe
 
-The first query is an implicit JOIN stemming from the `WHERE ci.symbol = es.symbol` statement. 
+This Pipe will have two Nodes, First one named `get_hourly_stats`, and a second that reads from the first one.
 
-The second is an explicit JOIN with that keyword. 
+#### Starting query
+
+##### `get_hourly_stats` Node
+
+```sql
+SELECT
+    toStartOfHour(timestamp) AS time,  
+    symbol,
+    avg(price) AS price_avg,
+    min(price) AS price_min,
+    max(price) AS price_max
+FROM event_stream
+GROUP BY symbol, time
+ORDER BY time DESC, symbol ASC    
+```
+
+#### Final queries
+
+##### `get_hourly_stats` Node
+
+```sql
+SELECT
+    toStartOfHour(timestamp) AS time,
+    symbol,
+    ROUND(avg(price), 2) AS price_avg,
+    ROUND(min(price), 2) AS price_min,
+    ROUND(max(price), 2) AS price_max
+FROM event_stream
+GROUP BY symbol, time
+ORDER BY time DESC, symbol ASC    
+```
+
+##### `endpoint` Node
+
+```sql
+%
+SELECT * 
+FROM get_hourly_stats
+WHERE 
+1=1
+{% if defined(company) %}
+  AND LOWER(symbol) = LOWER({{ String(company,description = 'String. Three-character symbol of interest. If not provided, all companies are retured. No default. ') }})
+{% end %}
+LIMIT {{ Int32(max_results,10,description="The maximum number of reports to return per response.") }}
+```
+
+### `join_data` Pipe
+
+#### Explicit JOIN 
 
 ```sql
 SELECT es.timestamp, ci.symbol, ci.name, es.price, ci.sector 
@@ -66,10 +120,12 @@ ORDER BY timestamp DESC
 LIMIT 100
 ```
 
+#### Implicit JOIN
+
 ```sql
 SELECT es.timestamp, ci.symbol, ci.name, es.price, ci.sector 
 FROM company_info ci
 JOIN event_stream es
 ON ci.symbol = es.symbol
-LIMIT 10
+LIMIT 100
 ```
