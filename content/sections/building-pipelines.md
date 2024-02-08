@@ -38,7 +38,7 @@ LIMIT 100
 Next we introduce dynamic query parameters using the Tinybird templating syntax.
 
 * Adding `max_results` and `company` API endpoint query paramters.
-* Since WHERE cause is dependent on user providing that query parameter, we need to handle when there are no user-triggered WHERE clauses and start with a always true `WHERE 1=1` clause and AND onto that. 
+* Since the WHERE cause is dependent on the user providing the `company` query parameter, we need to handle when there are no user-triggered WHERE clauses and start with an always-true `WHERE 1=1` clause and AND onto that. 
 * Adding `LOWER()` statement to make query case insensitive. 
 
 #### Final query
