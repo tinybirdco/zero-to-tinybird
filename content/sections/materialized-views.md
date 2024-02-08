@@ -10,28 +10,31 @@
 
 ### Documentation
 
-* https://www.tinybird.co/docs/concepts/materialized-views.html
+* [Core concepts: Materialized Views](https://www.tinybird.co/docs/concepts/materialized-views.html)
+* [Improve Endpoint Performance With Materialized Views](https://www.tinybird.co/docs/guides/materialized-views.html)
+* [Master Materialized Views](https://www.tinybird.co/docs/guides/master-materialized-views.html)
+* [Calculating data on ingestion with Materialized Views](https://www.tinybird.co/docs/guides/materialized-columns.html)
 
-* https://www.tinybird.co/docs/guides/materialized-views.html
+### Blog posts
+* [What are Materialized Views and why do they matter for real-time?](https://www.tinybird.co/blog-posts/what-are-materialized-views-and-why-do-they-matter-for-realtime)
+* [Roll up data with Materialized Views](https://www.tinybird.co/blog-posts/roll-up-data-with-materialized-views)
 
-* https://www.tinybird.co/docs/guides/master-materialized-views.html
+## Materialized Views consist of three components
 
-* https://www.tinybird.co/docs/guides/materialized-columns.html
-
+Materialized Views are made of three components:
+1) Pipe that applies SQL transformations and writes to a Data Source.
+2) Data Source that stores intermediate states arriving from that Pipe and along with the already-processed contents.  
+3) Pipe that reads from Data Source, using the -Merge function operator to merge intermediate states with previous state and deliver the 'final', up-to-the-second version. 
 
 ## Workshop SQL 
 
 ### `feed_hourly_mv` Pipe
 
-This is the first piece of the Materialized View (MV) workflow. 
+This is the first piece of the Materialized View (MV) workflow. In this Pipe, we will generate the hourly statistics (average, minimum, maximum, and standard deviation) as data arrives and write to the `hourly_stats_mv` Data Source. 
 
-MVs are made of three components:
-1) Pipe that applies SQL transformations and writes to a Data Source.
-2) Data Source that stores intermediate stats. 
-3) Pipe that reads from Data Source, using the -Merge function operator to merge intermediate states with previous state and deliver 'final', up-to-the-second version. 
+#### Building a Node named `created_mv_with_state`
 
-#### Starting with `aggregate` query:
-
+##### Starting with `aggregate` query:
 ```sql
 SELECT
     toStartOfHour(timestamp) AS time,  
@@ -43,7 +46,7 @@ FROM event_stream
 GROUP BY symbol, time
 ORDER BY time DESC, symbol ASC    
 ```
-#### Final query
+##### Final query
 
 * Adding -State operation to these avg/min/max functions.
 * Adding standard deviation function `stddevPopState(price) AS price_stddev` (don't forget the preceeding comma)
@@ -61,9 +64,9 @@ FROM event_stream
 GROUP BY symbol, timestamp 
  ```
 
-#### Creating `hourly_stats_mv` Data Source
+### Creating `hourly_stats_mv` Data Source
 
-When creating a Materialized view from this Node, the `AggregatingMergeTree` *Database Engine* is used. This is reflected in the resulting `hourly_stats_mv` definitional file:
+When creating a Materialized view from the `create_mv_with_state` Node, the `AggregatingMergeTree` *Database Engine* is used. When *Materializing* the `create_mv_with_staate` Node with the UI, the new Data Source will automatically use this engine. This is reflected in the resulting `hourly_stats_mv` definitional file:
 
 ```bash
 # Data Source created from Pipe 'feed_hourly_mv'
@@ -83,8 +86,9 @@ ENGINE_SORTING_KEY "timestamp, symbol"
 
 ### `hourly_stats` Pipe
 
-This is the third, and final piece of the Materialized View workflow. 
+This is the third, and final piece of the Materialized View workflow.  Its query uses the **-Merge** operator when generating the hourly statistics. The -Merge operator triggers the assembly of a up-to-day data set based on 'just arrived' intermediate states and the already-processed state. 
 
+This Pipe consists of three Nodes. The first Node performs the merge, the second provides a `company` query parameter, and the third provides `start_time` and `end_time` query parameters. 
 
 ####  `merge_from_mv` Node
 
@@ -102,7 +106,7 @@ ORDER BY symbol ASC, timestamp DESC
 
 ####  `filter_by_symbol` Node
 
-By now, a familiar pattern for filtering by company symbol.
+By now, a familiar pattern for filtering by `company` symbol.
 
 ```sql
 %
