@@ -6,11 +6,11 @@ What we will do in this session:
   * Building Pipes that filter, aggregate and join Data Sources.
   * Creating dynamic request parameters.   
 
-Screencasts:
+### Screencasts:
 
 * [Add query parameters to your APIs](https://youtu.be/PbfNIeq06DA)
 
-Documentation:
+### Documentation:
 
 * Core concepts: 
   * [Pipes](https://www.tinybird.co/docs/main-concepts.html#data-sources) 
