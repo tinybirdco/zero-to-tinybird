@@ -1,0 +1,16 @@
+TOKEN "filter_endpoint_read_6048" READ
+
+NODE filter_by_symbol
+SQL >
+
+    %
+    SELECT timestamp, symbol, price
+    FROM event_stream
+    WHERE 1=1
+    {% if defined(company) %}
+      AND LOWER(symbol) = LOWER({{ String(company,description = 'String. Three-character stock symbol of interest.') }})
+    {% end %}
+    ORDER BY timestamp DESC
+    LIMIT {{ Int32(max_results,10,description="The maximum number of reports to return per response.") }}
+
+

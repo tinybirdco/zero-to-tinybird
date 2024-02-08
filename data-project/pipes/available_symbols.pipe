@@ -1,4 +1,4 @@
-TOKEN "available_symbols_read" READ
+TOKEN "available_symbols_endpoint_read_5602" READ
 
 NODE endpoint
 SQL >
@@ -6,3 +6,5 @@ SQL >
     SELECT DISTINCT symbol
     FROM company_info
     ORDER BY symbol ASC
+
+

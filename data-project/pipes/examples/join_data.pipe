@@ -1,8 +1,0 @@
-NODE join_data_0
-SQL >
-
-    SELECT es.timestamp, ci.symbol, ci.name, es.price, ci.sector 
-    FROM company_info ci, event_stream es
-    WHERE ci.symbol = es.symbol
-    ORDER BY timestamp DESC
-    LIMIT 100

@@ -1,6 +1,6 @@
-TOKEN "aggregate_endpoint_read_1458" READ
+TOKEN "aggregate_endpoint_read_0423" READ
 
-NODE hourly_stats
+NODE get_hourly_stats
 SQL >
 
     SELECT
@@ -10,30 +10,22 @@ SQL >
         ROUND(min(price), 2) AS price_min,
         ROUND(max(price), 2) AS price_max
     FROM event_stream
-    GROUP BY
-        symbol, time
-    ORDER BY
-        time DESC,
-        symbol ASC    
+    GROUP BY symbol, time
+    ORDER BY time DESC, symbol ASC
 
 
 
 NODE endpoint
-DESCRIPTION >
-    For testing:
-    {% set company = 'ALG' %}
-
 SQL >
 
     %
     SELECT * 
-    FROM hourly_stats
+    FROM get_hourly_stats
     WHERE 
     1=1
     {% if defined(company) %}
       AND LOWER(symbol) = LOWER({{ String(company,description = 'String. Three-character symbol of interest. If not provided, all companies are retured. No default. ') }})
     {% end %}
-    LIMIT {{ Int32(max_results,100,description="The maximum number of reports to return per response.") }}
-
+    LIMIT {{ Int32(max_results,10,description="The maximum number of reports to return per response.") }}
 
 

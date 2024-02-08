@@ -9,12 +9,9 @@ SQL >
         maxState(price) AS price_max,
         stddevPopState(price) AS price_stddev
     FROM event_stream
-    GROUP BY
-        symbol,
-        timestamp
+    GROUP BY symbol, timestamp
 
 TYPE materialized
 DATASOURCE hourly_stats_mv
-ENGINE "AggregatingMergeTree"
-ENGINE_PARTITION_KEY "toYear(timestamp)"
-ENGINE_SORTING_KEY "timestamp, symbol"
+
+

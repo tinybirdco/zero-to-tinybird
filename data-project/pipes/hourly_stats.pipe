@@ -1,0 +1,15 @@
+NODE merge_from_mv
+SQL >
+
+    SELECT
+        timestamp,
+        symbol,
+        ROUND(avgMerge(price_avg), 2) AS price_avg,
+        ROUND(minMerge(price_min), 2) as price_min,
+        ROUND(maxMerge(price_max), 2) as price_max,
+        ROUND(stddevPopMerge(price_stddev), 2) AS price_stddev
+    FROM hourly_stats_mv
+    GROUP BY timestamp, symbol
+    ORDER BY symbol ASC, timestamp DESC
+
+

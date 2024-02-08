@@ -1,4 +1,3 @@
-# Data Source created from Pipe 'feed_daily_mv_with_state'
 
 SCHEMA >
     `symbol` String,

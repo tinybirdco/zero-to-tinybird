@@ -1,0 +1,21 @@
+NODE explicit_join
+SQL >
+
+    SELECT es.timestamp, ci.symbol, ci.name, es.price, ci.sector
+    FROM company_info ci
+    JOIN event_stream es ON ci.symbol = es.symbol
+    ORDER BY timestamp DESC, symbol ASC
+    LIMIT 100
+
+
+
+NODE implicit_join
+SQL >
+
+    SELECT es.timestamp, ci.symbol, ci.name, es.price, ci.sector
+    FROM company_info ci, event_stream es
+    WHERE ci.symbol = es.symbol
+    ORDER BY timestamp DESC, symbol ASC
+    LIMIT 100
+
+
