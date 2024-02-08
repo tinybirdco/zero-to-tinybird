@@ -1,12 +1,18 @@
 # An introduction to Materialized Views
-  * Purpose and example use cases.
-  * Filtering and aggregating at ingest time, not query time. Temporal rollups.
-  * State/Merge functions. 
+  
+What we will do in this session:     
+  * Review their purpose.  
+  * Discuss example use cases.
+  * Build an example.
+
+  * Topics:
+    * Filtering and aggregating at ingest time, not query time. 
+    * Temporal rollups.
+    * State/Merge functions. 
 
 ### Screencasts:
 
 * [Optimize query performance with Materialized Views](https://youtu.be/inhCgVU4dKY)
-
 
 ### Documentation
 
@@ -19,12 +25,19 @@
 * [What are Materialized Views and why do they matter for real-time?](https://www.tinybird.co/blog-posts/what-are-materialized-views-and-why-do-they-matter-for-realtime)
 * [Roll up data with Materialized Views](https://www.tinybird.co/blog-posts/roll-up-data-with-materialized-views)
 
-## Materialized Views consist of three components
+## Building Materialized Views
 
 Materialized Views are made of three components:
 1) Pipe that applies SQL transformations and writes to a Data Source.
 2) Data Source that stores intermediate states arriving from that Pipe and along with the already-processed contents.  
 3) Pipe that reads from Data Source, using the -Merge function operator to merge intermediate states with previous state and deliver the 'final', up-to-the-second version. 
+
+In the workshop project, these components are:
+1) `feed_hourly_mv` Pipe.
+2) `hourly_stats_mv` Data Source.
+2) `hourly_stats` Pipe. 
+
+See the next section for details on how those are built. 
 
 ## Workshop SQL 
 
@@ -32,7 +45,9 @@ Materialized Views are made of three components:
 
 This is the first piece of the Materialized View (MV) workflow. In this Pipe, we will generate the hourly statistics (average, minimum, maximum, and standard deviation) as data arrives and write to the `hourly_stats_mv` Data Source. 
 
-#### Building a Node named `created_mv_with_state`
+This pipe consists of a single `feed_mv_with_state` Node. This Node using the `-State` operator with the statistical functions to write intermediate states to the `hourly_stats_mv` Data Source, essentially keeping the current hour statistics up-to-date as new data arrive.  
+
+#### Building a Node named `feed_mv_with_state`
 
 ##### Starting with `aggregate` query:
 ```sql
@@ -66,7 +81,7 @@ GROUP BY symbol, timestamp
 
 ### Creating `hourly_stats_mv` Data Source
 
-When creating a Materialized view from the `create_mv_with_state` Node, the `AggregatingMergeTree` *Database Engine* is used. When *Materializing* the `create_mv_with_staate` Node with the UI, the new Data Source will automatically use this engine. This is reflected in the resulting `hourly_stats_mv` definitional file:
+When creating a Materialized view from the `feed_mv_with_state` Node, the `AggregatingMergeTree` *Database Engine* is used. When *Materializing* the `feed_mv_with_staate` Node with the UI, the new Data Source will automatically use this engine. This is reflected in the resulting `hourly_stats_mv` definitional file:
 
 ```bash
 # Data Source created from Pipe 'feed_hourly_mv'

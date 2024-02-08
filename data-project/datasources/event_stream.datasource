@@ -6,5 +6,5 @@ SCHEMA >
     `timestamp` DateTime `json:$.timestamp`
 
 ENGINE "MergeTree"
-ENGINE_PARTITION_KEY "toYYYYMM(__timestamp)"
+ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
 ENGINE_SORTING_KEY "symbol, timestamp, price"

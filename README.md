@@ -39,10 +39,13 @@ This project includes the Python script used to generate the real-time data stre
 
 Our intial **Tinybird data flow** will look like this: 
 
-![Data flow diagram](images/data-flow-2.0.1.png)
+![Data flow diagram](images/data-flow-2.png)
 
 Here we have the two *Data Sources*, and three data 'pipelines' based on them. These Tinybird *Pipes* illustrate fundamental SQL transformations: filtering, aggregating, and joining data sources. 
 
+Then we will create a Materialized View to provide hourly statistics:
+
+![Data flow diagram](images/data-flow-1.png)
 
 ## What topics will we be covering? 
 
