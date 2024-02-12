@@ -24,6 +24,11 @@ This repository includes resources to help attendees find documentation and othe
   * [Project with two Data Sources and three Pipes](https://github.com/jimmoffitt/z2t_next_2)
   * [`add_mv` Git branch with updates related to creating a Materialized View](https://github.com/jimmoffitt/z2t_next_2/tree/add_mv)
 
+* [Reference project GitHub Repository](https://github.com/jimmoffitt/z2t_workshop) - An example end-state of the project we will build. Complete with:
+  * [Pull request and branch history](https://github.com/jimmoffitt/z2t_workshop/pulls?q=is%3Apr+is%3Aclosed)
+  * [GitHub Actions managed by Tinybird CI/CD integration](https://github.com/jimmoffitt/z2t_workshop/actions)
+
+
 
 ## What are we building? 
 
@@ -67,7 +72,7 @@ Then we will create a Materialized View to provide hourly statistics:
 
 * Introduction to Materialized Views
     * Purpose and example use cases.
-    * Improving performace by filtering and aggregating at ingest time, not query time. 
+    * Improving performance by filtering and aggregating at ingest time, not query time. 
     * Temporal rollups.
     * State/Merge functions. 
 

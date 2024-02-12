@@ -69,14 +69,15 @@ ORDER BY time DESC, symbol ASC
 
 ```sql
 SELECT
-    symbol,
     toStartOfHour(timestamp) AS timestamp,
+    symbol,
     avgState(price) AS price_avg,
     minState(price) AS price_min,
     maxState(price) AS price_max,
     stddevPopState(price) AS price_stddev
 FROM event_stream
-GROUP BY symbol, timestamp 
+GROUP BY symbol, timestamp
+ORDER BY timestamp DESC, symbol ASC
  ```
 
 ### Creating `hourly_stats_mv` Data Source
@@ -157,5 +158,6 @@ WHERE 1=1
  {% if not defined(start_time) and defined(end_time) %}
      AND toDateTime(timestamp) BETWEEN addDays(toDateTime(parseDateTimeBestEffort({{DateTime(end_time)}})),-7) AND parseDateTimeBestEffort({{ DateTime(end_time) }})
  {% end %}
+ LIMIT {{ Int32(max_results,10,description="The maximum number of reports to return per response.") }}
 
 ```

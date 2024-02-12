@@ -17,6 +17,7 @@ What we will do in this session:
   * [Nodes](https://www.tinybird.co/docs/main-concepts.html#nodes)
   * [API Endpoints](https://www.tinybird.co/docs/main-concepts.html#api-endpoints)
 * [Using Query parameters](https://www.tinybird.co/docs/query/query-parameters.html)
+* [Advanced dynamic endpoints functions](https://www.tinybird.co/docs/guides/advanced-dynamic-endpoints-functions.html)
 
 
 ## Workshop SQL 
@@ -62,7 +63,7 @@ LIMIT {{ Int32(max_results,10,description="The maximum number of reports to retu
 
 This Pipe will have two Nodes, First one named `get_hourly_stats`, and a second that reads from the first one.
 
-#### Starting query
+#### Starting queries
 
 ##### `get_hourly_stats` Node
 
@@ -77,6 +78,18 @@ FROM event_stream
 GROUP BY symbol, time
 ORDER BY time DESC, symbol ASC    
 ```
+
+##### `endpoint` Node
+
+```sql
+%
+SELECT * 
+FROM get_hourly_stats
+WHERE 
+symbol = 'ALG'
+LIMIT 100
+```
+
 
 #### Final queries
 
@@ -108,9 +121,43 @@ WHERE
 LIMIT {{ Int32(max_results,10,description="The maximum number of reports to return per response.") }}
 ```
 
+These Nodes could be collapsed into a single Node, with the advantages of applying the `company` filter and LIMIT statement right away. 
+
+```sql
+%
+SELECT
+    toStartOfHour(timestamp) AS time,
+    symbol,
+    ROUND(avg(price), 2) AS price_avg,
+    ROUND(min(price), 2) AS price_min,
+    ROUND(max(price), 2) AS price_max
+FROM event_stream
+WHERE 1=1
+{% if defined(company) %}
+  AND LOWER(symbol) = LOWER({{ String(company,description = 'String. Three-character stock symbol of interest.') }})
+{% end %}
+GROUP BY symbol, time
+ORDER BY time DESC, symbol ASC    
+LIMIT {{ Int32(max_results,10,description="The maximum number of reports to return per response.") }}
+```
+
+
 ### `join_data` Pipe
 
+A quick example of joining two Tinybird Data Sources. Just like with other sets of database 'tables.'
+
 #### Explicit JOIN 
+
+```sql
+SELECT es.timestamp, ci.symbol, ci.name, es.price, ci.sector 
+FROM company_info ci
+JOIN event_stream es
+ON ci.symbol = es.symbol
+ORDER BY timestamp DESC
+LIMIT 100
+```
+
+#### Implicit JOIN
 
 ```sql
 SELECT es.timestamp, ci.symbol, ci.name, es.price, ci.sector 
@@ -120,12 +167,4 @@ ORDER BY timestamp DESC
 LIMIT 100
 ```
 
-#### Implicit JOIN
 
-```sql
-SELECT es.timestamp, ci.symbol, ci.name, es.price, ci.sector 
-FROM company_info ci
-JOIN event_stream es
-ON ci.symbol = es.symbol
-LIMIT 100
-```
