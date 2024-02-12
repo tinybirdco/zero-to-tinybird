@@ -69,14 +69,14 @@ This Pipe will have two Nodes, First one named `get_hourly_stats`, and a second 
 
 ```sql
 SELECT
-    toStartOfHour(timestamp) AS time,  
+    toStartOfHour(timestamp) AS timestamp,  
     symbol,
     avg(price) AS price_avg,
     min(price) AS price_min,
     max(price) AS price_max
 FROM event_stream
-GROUP BY symbol, time
-ORDER BY time DESC, symbol ASC    
+GROUP BY symbol, timestamp
+ORDER BY timestamp DESC, symbol ASC    
 ```
 
 ##### `endpoint` Node
@@ -97,14 +97,14 @@ LIMIT 100
 
 ```sql
 SELECT
-    toStartOfHour(timestamp) AS time,
+    toStartOfHour(timestamp) AS timestamp,
     symbol,
     ROUND(avg(price), 2) AS price_avg,
     ROUND(min(price), 2) AS price_min,
     ROUND(max(price), 2) AS price_max
 FROM event_stream
-GROUP BY symbol, time
-ORDER BY time DESC, symbol ASC    
+GROUP BY symbol, timestamp
+ORDER BY timestamp DESC, symbol ASC    
 ```
 
 ##### `endpoint` Node
@@ -126,7 +126,7 @@ These Nodes could be collapsed into a single Node, with the advantages of applyi
 ```sql
 %
 SELECT
-    toStartOfHour(timestamp) AS time,
+    toStartOfHour(timestamp) AS timestamp,
     symbol,
     ROUND(avg(price), 2) AS price_avg,
     ROUND(min(price), 2) AS price_min,
@@ -136,8 +136,8 @@ WHERE 1=1
 {% if defined(company) %}
   AND LOWER(symbol) = LOWER({{ String(company,description = 'String. Three-character stock symbol of interest.') }})
 {% end %}
-GROUP BY symbol, time
-ORDER BY time DESC, symbol ASC    
+GROUP BY symbol, timestamp
+ORDER BY timestamp DESC, symbol ASC    
 LIMIT {{ Int32(max_results,10,description="The maximum number of reports to return per response.") }}
 ```
 
