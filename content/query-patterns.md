@@ -20,17 +20,33 @@ Note:
 
 ### Data from the most recent hour
 ```sql
-SELECT * 
-FROM stock_price_stream
+SELECT symbol, timestamp, price  
+FROM event_stream
 WHERE toDateTime(date) BETWEEN addHours(NOW(),-1) AND NOW()
 ```
 
 ### Data between explicit dates
 ```sql
-SELECT * 
-FROM stock_price_stream
+SELECT symbol, timestamp, price  
+FROM event_stream
 WHERE toDateTime(date) BETWEEN '2023-12-07 17:22:00' AND '2023-12-07 17:23:00'
 ```
+
+### Data from yesterday, midnight to midnight
+
+This SQL uses ClickHouse `today`,`yesterday`, and `toStartofDate` functions.
+
+```sql
+SELECT symbol, timestamp, price 
+FROM event_stream
+WHERE
+  timestamp >= toStartOfDay(toDateTime(yesterday()))
+  AND timestamp < toStartOfDay(toDateTime(today()))
+LIMIT 10000
+```
+
+
+
 
 ### Selecting most recent data 
 
@@ -41,7 +57,7 @@ The following query sorts the data in reverse chronological order, and uses the 
 ```sql
 
 SELECT * 
-FROM incoming_data
+FROM event_stream
 ORDER BY timestamp DESC
 LIMIT 1 BY id
 
@@ -57,7 +73,7 @@ WITH RankedData AS (
         value,
         ROW_NUMBER() OVER (PARTITION BY id ORDER BY timestamp DESC) AS row_num
     FROM
-        incoming_data
+        event_stream
 )
 SELECT
     id,
@@ -187,25 +203,25 @@ Based on the IQR, lower and upper bounds are set for determining data outliers:
 
 ```sql
 WITH stats AS (SELECT symbol
-quantileExact(0.25) (amount) AS lower_quartile,
-quantileExact(0.5) (amount) AS mid_quartile,
-quantileExact(0.75) (amount) AS upper_quartile,
+quantileExact(0.25) (price) AS lower_quartile,
+quantileExact(0.5) (price) AS mid_quartile,
+quantileExact(0.75) (price) AS upper_quartile,
 (upper_quartile - lower_quartile) * 1.5 AS IQR
-FROM stock_price_stream
+FROM event_stream
 WHERE timestamp >= toDate(NOW()) - INTERVAL 10 MINUTES
 GROUP BY symbol
 LIMIT 10
 )
  SELECT DISTINCT timestamp, 
     symbol, 
-    amount, 
+    price, 
     ROUND((stats.lower_quartile - stats.IQR),2) AS lower_bound, 
     ROUND((stats.upper_quartile + stats.IQR),2) AS upper_bound 
- FROM stock_price_stream
- JOIN stats ON incoming_data.symbol = stats.symbol
+ FROM event_stream
+ JOIN stats ON event_stream.symbol = stats.symbol
  WHERE timestamp >= toDate(NOW()) - INTERVAL 10 MINUTES
- AND (amount > (stats.upper_quartile + stats.IQR)
- OR amount < (stats.lower_quartile - stats.IQR))
+ AND (price > (stats.upper_quartile + stats.IQR)
+ OR price < (stats.lower_quartile - stats.IQR))
  ORDER BY timestamp DESC
 ```
 
@@ -231,20 +247,20 @@ These parameters, could be promoted to API Endpoint query parameters.
 
 WITH stats AS (
     SELECT symbol,
-        avg(amount) AS average,
-        stddevPop(amount) AS stddev
-    FROM stock_price_stream
+        avg(price) AS average,
+        stddevPop(price) AS stddev
+    FROM event_stream
     WHERE date BETWEEN NOW() - INTERVAL _stats_time_window_minutes MINUTE AND NOW()
     GROUP BY symbol  
 )
-SELECT sps.date, 
-     sps.symbol, 
-     sps.amount, 
-     (sps.amount - stats.average)/stats.stddev AS zscore,
+SELECT es.date, 
+     es.symbol, 
+     es.amount, 
+     (es.price - stats.average)/stats.stddev AS zscore,
      stats.average,
      stats.stddev
-FROM stock_price_stream sps
-JOIN stats s ON s.symbol = sps.symbol
+FROM event_stream es
+JOIN stats s ON s.symbol = es.symbol
 WHERE date BETWEEN NOW() - INTERVAL _anomaly_scan_time_window_seconds SECOND AND NOW()
 ORDER BY date DESC
 ```
@@ -254,7 +270,7 @@ ORDER BY date DESC
 
 ```sql
 SELECT * 
-FROM stock_price_stream
+FROM event_stream
 WHERE amount < 0.05 OR amount > 0.95
 LIMIT 10
 ```
@@ -263,16 +279,13 @@ LIMIT 10
 
 These queries have been constructed in reference to these two schemas:
 
-`stock_price_stream` - a real-time stream of stock price events generated with Mockingbird and written to the Events API. 
+`event_stream` - a real-time stream of stock price events generated with Mockingbird and written to the Events API. 
 
 ```
-`amount` Float32 `json:$.amount` ,
-`date` DateTime `json:$.date` ,
-`stock_symbol` String `json:$.stock_symbol` ,
+`price` Float32 `json:$.price` ,
+`timestamp` DateTime `json:$.timestamp` ,
+`symbol` String `json:$.symbol` ,
 ```
-- [ ] Mockingbird emits JSON and the schema indicates how that JSON is parsed by key to extract the values.  
-- [ ] For `amount`, update Mockingbird type to `#####.##` currency and rename to `price`? Or just update Data Source schema, `price` Decimal(10,2) `json:$amount`?
-  
 `company_info` - Mock data about ~85 fictional companies. 
 
 ```

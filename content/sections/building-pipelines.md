@@ -18,6 +18,7 @@ What we will do in this session:
   * [API Endpoints](https://www.tinybird.co/docs/main-concepts.html#api-endpoints)
 * [Using Query parameters](https://www.tinybird.co/docs/query/query-parameters.html)
 * [Advanced dynamic endpoints functions](https://www.tinybird.co/docs/guides/advanced-dynamic-endpoints-functions.html)
+* Learn about ClickHouse [Functions for Working with Dates and Times](https://clickhouse.com/docs/en/sql-reference/functions/date-time-functions)
 
 
 ## Workshop SQL 
