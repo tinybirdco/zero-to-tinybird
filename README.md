@@ -20,13 +20,9 @@ This repository includes resources to help attendees find documentation and othe
 
 ## Other resources:
 
-* Snapshots of example content:
-  * [Project with two Data Sources and three Pipes](https://github.com/jimmoffitt/z2t_next_2)
-  * [`add_mv` Git branch with updates related to creating a Materialized View](https://github.com/jimmoffitt/z2t_next_2/tree/add_mv)
-
-* [Reference project GitHub Repository](https://github.com/jimmoffitt/z2t_workshop) - An example end-state of the project we will build. Complete with:
-  * [Pull request and branch history](https://github.com/jimmoffitt/z2t_workshop/pulls?q=is%3Apr+is%3Aclosed)
-  * [GitHub Actions managed by Tinybird CI/CD integration](https://github.com/jimmoffitt/z2t_workshop/actions)
+* [Reference project GitHub Repository](https://github.com/jimmoffitt/kafka-to-analytics) - An example end-state of the project we will build. Complete with:
+  * [Recent Pull request and branch history](https://github.com/jimmoffitt/kafka-to-analytics/pulls?q=is%3Apr+is%3Aclosed)
+  * [GitHub Actions managed by Tinybird CI/CD integration](https://github.com/jimmoffitt/kafka-to-analytics/actions)
 * Below you will find a PDF of the deck we used for our first workshop on February 13, 2024. 
 
 
