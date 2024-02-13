@@ -93,7 +93,7 @@ Then we will create a Materialized View to provide hourly statistics:
 
 ![](images/deck.png)
 
-[Workshop deck from February 13, 2024](/content/Kafka-to-Analtics-workshop.pdf)
+[Workshop deck from February 13, 2024](/content/Kafka-to-Analytics-workshop.pdf)
 
 
 
