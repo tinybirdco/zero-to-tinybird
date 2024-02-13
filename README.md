@@ -27,7 +27,7 @@ This repository includes resources to help attendees find documentation and othe
 * [Reference project GitHub Repository](https://github.com/jimmoffitt/z2t_workshop) - An example end-state of the project we will build. Complete with:
   * [Pull request and branch history](https://github.com/jimmoffitt/z2t_workshop/pulls?q=is%3Apr+is%3Aclosed)
   * [GitHub Actions managed by Tinybird CI/CD integration](https://github.com/jimmoffitt/z2t_workshop/actions)
-
+* Below you will find a PDF of the deck we used for our first workshop on February 13, 2024. 
 
 
 ## What are we building? 
@@ -92,7 +92,12 @@ Then we will create a Materialized View to provide hourly statistics:
     [See more here.](/content/sections/version-control.md)
 
 
+## Workshop deck
 
+
+![](images/deck.png)
+
+[Workshop deck from FFebruary 13, 2024](/content/Kafka-to-Analtics-workshop.pdf)
 
 
 
