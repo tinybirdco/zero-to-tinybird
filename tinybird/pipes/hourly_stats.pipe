@@ -1,0 +1,75 @@
+NODE merge_from_mv
+DESCRIPTION >
+    This Node triggers the building of the current `hourly_stats_mv` Data Source state, by using the `-Merge` functions. The `feed_hourly_mv` Pipe, used to transform incoming data and write it, using the `-State` functions to write the intermediate data states as new data arrives.
+
+SQL >
+
+    SELECT
+        timestamp,
+        symbol,
+        ROUND(avgMerge(price_avg), 2) AS price_avg,
+        ROUND(minMerge(price_min), 2) as price_min,
+        ROUND(maxMerge(price_max), 2) as price_max,
+        ROUND(stddevPopMerge(price_stddev), 2) AS price_stddev
+    FROM hourly_stats_mv
+    GROUP BY timestamp, symbol
+    ORDER BY symbol ASC, timestamp DESC
+
+
+
+NODE filter_by_symbol
+SQL >
+
+    SELECT * FROM merge_from_mv
+
+
+
+NODE filter_by_time_period
+DESCRIPTION >
+    Here we provide flexible handling of `start_time` and `end_time`.
+        When it comes to time, users typically want to pick a time period of interest, defined by start and end times. Four common modes for time requests include having the following start and end times provided:
+        * **Both start and end times.** The user has specific time period of interest, and typically uses a by-the-second resolution.
+        * **No start and end times.** The most recent data is usually implied and it's up to the server to enforce limits. This usually means declaring a maximum duration to server, e.g. the last day, week, or month. Some maximum number of objects to return is recommended.
+        * **Only start time.** The user has a specific beginning time in mind, the beginning of some event of interest.
+        * **Only end time.** The user has a specific end of an event in mind, and wants data leading up to it.
+        Here we support serving a maximum of 7 days if the user does not specify a start or end time.
+
+SQL >
+
+    %
+        SELECT *
+        FROM filter_by_symbol
+        WHERE
+            1 = 1
+            {% if defined(start_time) and defined(end_time) %}
+                AND toDateTime(timestamp) BETWEEN parseDateTimeBestEffort(
+                    {{
+                        DateTime(
+                            start_time,
+                            description="'YYYY-MM-DD HH:mm:ss'. UTC. Optional and defaults to 7 days ago. Defines the start of the period of interest. ",
+                        )
+                    }}
+                )
+                AND parseDateTimeBestEffort(
+                    {{
+                        DateTime(
+                            end_time,
+                            description="'YYYY-MM-DD HH:mm:ss'. UTC. Optional and defaults to time of request. Defines the end of the period of interest.",
+                        )
+                    }}
+                )
+            {% end %}
+            {% if not defined(start_time) and not defined(end_time) %}
+                AND toDateTime(timestamp) BETWEEN addDays(now(), -7) AND NOW()
+            {% end %}
+            {% if defined(start_time) and not defined(end_time) %}
+                AND toDateTime(timestamp) BETWEEN parseDateTimeBestEffort({{ DateTime(start_time) }})
+                AND now()
+            {% end %}
+            {% if not defined(start_time) and defined(end_time) %}
+                AND toDateTime(timestamp)
+                BETWEEN addDays(toDateTime(parseDateTimeBestEffort({{ DateTime(end_time) }})), -7)
+                AND parseDateTimeBestEffort({{ DateTime(end_time) }})
+            {% end %}
+
+

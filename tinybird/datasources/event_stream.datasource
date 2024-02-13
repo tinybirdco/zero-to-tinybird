@@ -1,0 +1,19 @@
+
+SCHEMA >
+    `id` Int16 `json:$.id`,
+    `price` Float32 `json:$.price`,
+    `symbol` String `json:$.symbol`,
+    `timestamp` DateTime `json:$.timestamp`
+
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(__timestamp)"
+ENGINE_SORTING_KEY "symbol, timestamp, price"
+
+KAFKA_CONNECTION_NAME 'pkc-419q3.us-east4.gcp.confluent.cloud:9092'
+KAFKA_TOPIC 'stock_price_events'
+KAFKA_GROUP_ID 'stock_price_events_1707837264837'
+KAFKA_AUTO_OFFSET_RESET 'earliest'
+KAFKA_STORE_RAW_VALUE 'False'
+KAFKA_STORE_HEADERS 'False'
+KAFKA_TARGET_PARTITIONS 'auto'
+KAFKA_KEY_AVRO_DESERIALIZATION ''

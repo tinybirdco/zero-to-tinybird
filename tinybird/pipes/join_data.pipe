@@ -1,0 +1,26 @@
+NODE explicit_join
+DESCRIPTION >
+    Here we JOIN with the small `company-info` Data Source on the right hand side of the JOIN.
+
+SQL >
+
+    SELECT es.timestamp, ci.symbol, ci.name, es.price, ci.sector
+    FROM event_stream es
+    JOIN company_info ci ON ci.symbol = es.symbol
+    ORDER BY timestamp DESC, symbol ASC
+
+
+
+NODE implicit_join
+DESCRIPTION >
+    This will work but no control over how the JOIN is performed.
+
+SQL >
+
+    SELECT es.timestamp, ci.symbol, ci.name, es.price, ci.sector
+    FROM event_stream es, company_info ci
+    WHERE es.symbol = ci.symbol
+    ORDER BY timestamp DESC
+    LIMIT 100
+
+

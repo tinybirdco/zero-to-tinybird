@@ -9,7 +9,9 @@ SQL >
         maxState(price) AS price_max,
         stddevPopState(price) AS price_stddev
     FROM event_stream
-    GROUP BY symbol, timestamp
+    GROUP BY
+        symbol,
+        timestamp
 
 TYPE materialized
 DATASOURCE hourly_stats_mv

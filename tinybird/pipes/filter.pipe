@@ -1,0 +1,17 @@
+TOKEN "filter_endpoint_read_0869" READ
+
+NODE filter_by_symbol
+SQL >
+
+    %
+    SELECT symbol, timestamp, price
+    FROM event_stream
+    WHERE 1=1
+    {% if defined(company) %}
+      AND symbol = {{ String(company,description = 'String. Three-character stock symbol of interest.') }}
+    {% end %}
+    ORDER BY timestamp DESC
+    LIMIT {{ Int32(max_results,100) }}
+
+
+
