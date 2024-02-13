@@ -77,8 +77,7 @@ SELECT
     stddevPopState(price) AS price_stddev
 FROM event_stream
 GROUP BY symbol, timestamp
-ORDER BY timestamp DESC, symbol ASC
- ```
+```
 
 ### Creating `hourly_stats_mv` Data Source
 
