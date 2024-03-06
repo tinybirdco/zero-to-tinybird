@@ -8,9 +8,7 @@ A collection of SQL patterns. A WIP!
 
 Project SQL examples are built with two simple data schemas that describe the data sets used in the workshop. 
 
-Project queries have been constructed in reference to these two schemas:
-
-`event_stream` - a real-time stream of stock price events generated with Mockingbird and written to the Events API. 
+`event_stream` - a real-time stream of (mock) stock price events generated with a Python script, publishing to either a Kafka stream or writing event JSON directly to Tinybird using the Events API. 
 
 ```
 `price` Float32 `json:$.price` ,
@@ -18,7 +16,7 @@ Project queries have been constructed in reference to these two schemas:
 `symbol` String `json:$.symbol` ,
 ```
 
-`company_info` - Mock data about ~85 fictional companies. 
+`company_info` - Mock data about ~85 fictional companies. These metadata is imported into a Tinybird Data Source at the beginning of the Workshop. 
 
 ```
 `symbol` String,
@@ -26,8 +24,7 @@ Project queries have been constructed in reference to these two schemas:
 `creation_date` Date,
 `sector` String,
 ```
-
-
+The common attribute `symbol` is used to JOIN the two data sources. 
 
 ## Working with time
 
