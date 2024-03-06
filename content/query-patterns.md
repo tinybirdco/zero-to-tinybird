@@ -1,6 +1,6 @@
 # Query patterns
 
-A collection of SQL patterns. A WIP! 
+A collection of SQL patterns. An evolving WIP... 
 
 
 
@@ -292,6 +292,39 @@ ORDER BY date DESC
 ```
 
 # Other things
+
+## Pagination
+
+Tinybird projects are typically built with massive amounts of data and require a pagination method to enable API Endpoint clients to request data in consumable chunks. API Endpoints will generate a maximum of 10 MB of data per request. API Endpoint clients are responsible for managing 'page' requests. 
+
+Tinybird pagination is managed with `limit` and `offset` parameters. The `limit` is the maximum number of rows to return. The `offset` is the number of rows to skip before starting to return results. If you are requesting 50 MB of data, you will need to request one 'page' at a time, updating 'offset' each time, for a total of five requests. 
+
+Here is an example query that uses the `LIMIT #, #` form to set the *offset* (first number) and the *maximum number* of rows (second number) to return:
+
+```sql
+  SELECT browser, uniqMerge(visits) AS visits, countMerge(hits) AS hits
+  FROM analytics_sources_mv
+  WHERE date >= '2024-01-01' AND date <= '2024-02-01'
+  GROUP BY browser
+  ORDER BY visits DESC
+  LIMIT 0, 100
+```
+
+In this case, we want to start from the beginning (row 0). The second number (100) specifies the limit, which is the maximum number of rows to return. So, the query will return a maximum of 100 rows, starting from the first row (offset 0). Since the results rank the top number of visits (by ordering visits in descending order), this will return the top 100. If you want to request visits ranked 101-200, the LIMIT statement would be updated to `LIMIT 100, 100`.
+
+Here is an example query snippet that establishes `events_per_page` and `page` query parameters:
+
+```sql
+%
+SELECT * FROM previous_node
+LIMIT {{Int32(events_per_page, 100)}}
+OFFSET {{Int32(page, 0) * Int32(events_per_page, 100)}
+```
+
+If you want to use a single LIMIT statement: `LIMIT {{Int32(page, 0) * Int32(events_per_page, 100)},
+
+Learn more about pagination [HERE](https://www.tinybird.co/docs/query/query-parameters.html#pagination).
+
 
 ## Endpoint output objects
 
