@@ -319,7 +319,60 @@ When pulling these objects from API Endpoints, here is what these `stock price" 
     "stock_symbol": "TTM"
 }
 ```
-## SQL helpers 
+
+## Renaming object attributes along the pipeline
+
+As you develop new and iterate old projects, it's nice to land on a set of SQL query templates that feel portable between Tinybird Workspaces. Here are some thoughts around naming your schema fields, selecting data types, and curating reusable queries.   
+
+### What's in a name (or data type)?
+
+As we develop projects, a lot of time will be spent writing queries around three fundamental attributes of an event:
+* Unique identifiers for the `sensors` that are emitting data.
+* Exactly when the event was emitted. Usually down to the second, and always in UTC.
+* The data value the sensor generated. This could be a 'delete' event from a CDC-connected database, a 'purchase' event from a mobile app, or a measurement from a weather station.
+
+For this project we are using the following field names and types to describe our data schema for these attributes: 
+* `symbol` String
+* `timestamp` DateTime
+* `price` Float32
+
+For this project, we are working with sensors with a unique string identifier and floating-point numeric data values, hence the `Sting` and `Float32` declarations.
+
+For the [Anomaly Detection project](https://github.com/tinybirdco/use-case-anomaly-detection), these fundamental fields were described as:
+* `id` Int16
+* `timestamp` DateTime
+* `value` Float32
+
+Although the *names* of the incoming floating-points are different (`price` and `value`), these labels can be easily altered and updated along the pipeline (see next section). The big difference is the different data types used as the unique sensor identifiers (`symbol` and `id`). Furthermore, it is common to have both sensor ids and data values be alphanumeric data types. 
+
+Given these different data types, you can expect to rewrite SQL developed for one to work with the other. 
+
+### Renaming attributes along the Pipeline.
+
+As you build multiple Tinybird Workspaces, you will find yourself borrowing queries developed in previous projects. You are sure to curate a set of fundamental queries that fit in with nearly any of your Workspaces. A query that returns the *most recent* events from a set of sensors is an example of an universally useful query. So, it's great when the inherited SQL already matches your new data schema. 
+
+As data travels from their source to your Pipe queries, you have several opportunities to customize the data attribute names you want to bake into your queries. Here are some places where you can update the names for object attributes:
+
+* **When generated**. Sometimes it is possible to affect the attribute names at the object source. For this project, with its Python data generator, there is complete control on the names and data types used. 
+* **In Data Source defintion**. Below is an example schema from a Data Source *definitional file* that maps an incoming JSON object to schema field names. Here we could instead have a line that updates a name: `value` Float32 `json:$.price` 
+
+```bash
+SCHEMA >
+    `price` Float32 `json:$.price`,
+    `symbol` String `json:$.symbol`,
+    `timestamp` DateTime `json:$.timestamp`
+```
+
+* **In SQL queries**. With SQL you can use aliases to rename attributes in SELECT statements. Any aliases are referenced in the other SQL sections, such as WHERE clauses.
+
+```sql
+SELECT value AS price
+WHERE price < 10
+```
+
+## More notes
+
+### SQL helpers 
 
 Formating numbers, trimming to 2 digits. 
 `ROUND(x,2)`
@@ -330,12 +383,3 @@ Renaming attributes.
 Comparing strings.
 `LOWER(thisCityName) = 'london'` 
 `UPPER(thisCityName) = 'LONDON'` 
-
-
-
-## Renaming objects along the pipeway
-
-* When generated.
-* In Data Source defintion.
-* In SQL queries.
-
