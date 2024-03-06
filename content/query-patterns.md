@@ -2,7 +2,32 @@
 
 A collection of SQL patterns. A WIP! 
 
-These SQL examples are built with [two simple schemas](#data-schema) that describe the data sets using in the workshop. 
+
+
+## Data schema
+
+Project SQL examples are built with two simple data schemas that describe the data sets used in the workshop. 
+
+Project queries have been constructed in reference to these two schemas:
+
+`event_stream` - a real-time stream of stock price events generated with Mockingbird and written to the Events API. 
+
+```
+`price` Float32 `json:$.price` ,
+`timestamp` DateTime `json:$.timestamp` ,
+`symbol` String `json:$.symbol` ,
+```
+
+`company_info` - Mock data about ~85 fictional companies. 
+
+```
+`symbol` String,
+`name` String,
+`creation_date` Date,
+`sector` String,
+```
+
+
 
 ## Working with time
 
@@ -194,17 +219,21 @@ WHERE date > NOW() - INTERVAL time_window_minutes MINUTE
 
 ### Interquartile Range
 
-Based on a time window (defaulting here to a 10-minute window), calculate the lower quartile, the medium, and the upper quartile. The IQR is then set to (uper quartile - lower quartile) * 1.5.
+The first step of the Interquartile Range (IQR) method is calculating the first and third quartiles (Q1 and Q3). These quartiles are based on a moving time window of the recent data.
 
-Based on the IQR, lower and upper bounds are set for determining data outliers:
-* lower bound = lower quartile - IQR
-* upper bound = upper quartile - IQR
+The difference between these two quartiles is referred to as the IQR, as in:
+
+IQR = Q3 - Q1
+
+Data points that are below or above some level based on a multiplier of this IQR are considered outliers. Commonly, this multiple is set to 1.5, so we are looking for cases where:
+
+values < Q1 - (IQR * 1.5)
+values > Q3 + (IQR * 1.5)
 
 
 ```sql
 WITH stats AS (SELECT symbol
 quantileExact(0.25) (price) AS lower_quartile,
-quantileExact(0.5) (price) AS mid_quartile,
 quantileExact(0.75) (price) AS upper_quartile,
 (upper_quartile - lower_quartile) * 1.5 AS IQR
 FROM event_stream
@@ -264,37 +293,6 @@ JOIN stats s ON s.symbol = es.symbol
 WHERE date BETWEEN NOW() - INTERVAL _anomaly_scan_time_window_seconds SECOND AND NOW()
 ORDER BY date DESC
 ```
-
-### Comparing data with thresholds
-
-
-```sql
-SELECT * 
-FROM event_stream
-WHERE amount < 0.05 OR amount > 0.95
-LIMIT 10
-```
-
-## Data schema
-
-These queries have been constructed in reference to these two schemas:
-
-`event_stream` - a real-time stream of stock price events generated with Mockingbird and written to the Events API. 
-
-```
-`price` Float32 `json:$.price` ,
-`timestamp` DateTime `json:$.timestamp` ,
-`symbol` String `json:$.symbol` ,
-```
-`company_info` - Mock data about ~85 fictional companies. 
-
-```
-`symbol` String,
-`name` String,
-`creation_date` Date,
-`sector` String,
-```
-
 
 # Other things
 
