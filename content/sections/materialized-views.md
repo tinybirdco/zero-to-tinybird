@@ -51,7 +51,7 @@ This pipe consists of a single `feed_mv_with_state` Node. This Node using the `-
 
 #### Building a Node named `feed_mv_with_state`
 
-##### Starting with `aggregate` query:
+##### Starting with aggregating query from the `aggregate` Pipe:
 ```sql
 SELECT
     toStartOfHour(timestamp) AS time,  
