@@ -2,7 +2,7 @@ DESCRIPTION >
 	A symbol endpoint that provides all the unique stock symbols for companies listed in the `company-info` Data Source. This is used to supply options for a dashboard "Select symbol" dropdown box.
 
 
-TOKEN "available_symbols_endpoint_read_8274" READ
+TOKEN "available_symbols_endpoint_read" READ
 
 NODE endpoint
 SQL >

@@ -1,3 +1,5 @@
+TOKEN "hourly_stats_read" READ
+
 NODE merge_from_mv
 DESCRIPTION >
     This Node triggers the building of the current `hourly_stats_mv` Data Source state, by using the `-Merge` functions. The `feed_hourly_mv` Pipe, used to transform incoming data and write it, using the `-State` functions to write the intermediate data states as new data arrives.

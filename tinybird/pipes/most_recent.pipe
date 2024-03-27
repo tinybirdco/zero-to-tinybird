@@ -1,6 +1,17 @@
+TOKEN "most_recent_endpoint_read" READ
+
 NODE endpoint
 SQL >
 
-    SELECT symbol, timestamp, price FROM event_stream ORDER BY timestamp DESC LIMIT 1 BY symbol
+    %
+        SELECT symbol, timestamp, price
+        FROM event_stream
+        WHERE
+            1 = 1
+            {% if defined(company) %}
+                AND symbol = {{ String(company, description='Company stock symbol to return.') }}
+            {% end %}
+        ORDER BY timestamp DESC
+        LIMIT 1 BY symbol
 
 

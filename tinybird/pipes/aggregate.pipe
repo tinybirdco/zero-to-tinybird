@@ -24,7 +24,8 @@ SQL >
     {% if defined(company) %}
       AND symbol = {{ String(company,description = 'String. Three-character stock symbol of interest.') }}
     {% end %}
-    LIMIT {{ Int32(max_results,100) }}
+    AND timestamp > addHours(NOW(), -{{ Int16(hours,24,description='How many hours of event data to return.')}})
+
 
 
 
