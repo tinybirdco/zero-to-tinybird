@@ -27,15 +27,17 @@ What we will do in this session:
 
 ## Building Materialized Views
 
-Materialized Views are made of three components:
+Materialized Views (MVs) are made of two components:
 1) Pipe that applies SQL transformations and writes to a Data Source.
 2) Data Source that stores intermediate states arriving from that Pipe and along with the already-processed contents.  
-3) Pipe that reads from Data Source, using the -Merge function operator to merge intermediate states with previous state and deliver the 'final', up-to-the-second version. 
+
+Once a MV is created, you can build Pipes that read from those MV-based Data Sources. For this project, we are using the *-Merge* function operator to merge intermediate states with previous state and deliver the 'final', up-to-the-second version. 
 
 In the workshop project, these components are:
 1) `feed_hourly_mv` Pipe.
 2) `hourly_stats_mv` Data Source.
-2) `hourly_stats` Pipe. 
+
+Then the `hourly_stats` Pipe triggers the -Merge operations and returns the latest results. 
 
 See the next section for details on how those are built. 
 
