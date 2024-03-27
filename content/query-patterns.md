@@ -1,8 +1,30 @@
 # Query patterns
 
-A collection of SQL patterns. A WIP! 
+A collection of SQL patterns. An evolving WIP... 
 
-These SQL examples are built with [two simple schemas](#data-schema) that describe the data sets using in the workshop. 
+
+
+## Data schema
+
+Project SQL examples are built with two simple data schemas that describe the data sets used in the workshop. 
+
+`event_stream` - a real-time stream of (mock) stock price events generated with a Python script, publishing to either a Kafka stream or writing event JSON directly to Tinybird using the Events API. 
+
+```
+`price` Float32 `json:$.price` ,
+`timestamp` DateTime `json:$.timestamp` ,
+`symbol` String `json:$.symbol` ,
+```
+
+`company_info` - Mock data about ~85 fictional companies. These metadata is imported into a Tinybird Data Source at the beginning of the Workshop. 
+
+```
+`symbol` String,
+`name` String,
+`creation_date` Date,
+`sector` String,
+```
+The common attribute `symbol` is used to JOIN the two data sources. 
 
 ## Working with time
 
@@ -194,17 +216,21 @@ WHERE date > NOW() - INTERVAL time_window_minutes MINUTE
 
 ### Interquartile Range
 
-Based on a time window (defaulting here to a 10-minute window), calculate the lower quartile, the medium, and the upper quartile. The IQR is then set to (uper quartile - lower quartile) * 1.5.
+The first step of the Interquartile Range (IQR) method is calculating the first and third quartiles (Q1 and Q3). These quartiles are based on a moving time window of the recent data.
 
-Based on the IQR, lower and upper bounds are set for determining data outliers:
-* lower bound = lower quartile - IQR
-* upper bound = upper quartile - IQR
+The difference between these two quartiles is referred to as the IQR, as in:
+
+IQR = Q3 - Q1
+
+Data points that are below or above some level based on a multiplier of this IQR are considered outliers. Commonly, this multiple is set to 1.5, so we are looking for cases where:
+
+values < Q1 - (IQR * 1.5)
+values > Q3 + (IQR * 1.5)
 
 
 ```sql
 WITH stats AS (SELECT symbol
 quantileExact(0.25) (price) AS lower_quartile,
-quantileExact(0.5) (price) AS mid_quartile,
 quantileExact(0.75) (price) AS upper_quartile,
 (upper_quartile - lower_quartile) * 1.5 AS IQR
 FROM event_stream
@@ -265,38 +291,40 @@ WHERE date BETWEEN NOW() - INTERVAL _anomaly_scan_time_window_seconds SECOND AND
 ORDER BY date DESC
 ```
 
-### Comparing data with thresholds
+# Other things
 
+## Pagination
+
+Tinybird projects are typically built with massive amounts of data and require a pagination method to enable API Endpoint clients to request data in consumable chunks. API Endpoints will generate a maximum of 10 MB of data per request. API Endpoint clients are responsible for managing 'page' requests. 
+
+Tinybird pagination is managed with `limit` and `offset` parameters. The `limit` is the maximum number of rows to return. The `offset` is the number of rows to skip before starting to return results. If you are requesting 50 MB of data, you will need to request one 'page' at a time, updating 'offset' each time, for a total of five requests. 
+
+Here is an example query that uses the `LIMIT #, #` form to set the *offset* (first number) and the *maximum number* of rows (second number) to return:
 
 ```sql
-SELECT * 
-FROM event_stream
-WHERE amount < 0.05 OR amount > 0.95
-LIMIT 10
+  SELECT browser, uniqMerge(visits) AS visits, countMerge(hits) AS hits
+  FROM analytics_sources_mv
+  WHERE date >= '2024-01-01' AND date <= '2024-02-01'
+  GROUP BY browser
+  ORDER BY visits DESC
+  LIMIT 0, 100
 ```
 
-## Data schema
+In this case, we want to start from the beginning (row 0). The second number (100) specifies the limit, which is the maximum number of rows to return. So, the query will return a maximum of 100 rows, starting from the first row (offset 0). Since the results rank the top number of visits (by ordering visits in descending order), this will return the top 100. If you want to request visits ranked 101-200, the LIMIT statement would be updated to `LIMIT 100, 100`.
 
-These queries have been constructed in reference to these two schemas:
+Here is an example query snippet that establishes `events_per_page` and `page` query parameters:
 
-`event_stream` - a real-time stream of stock price events generated with Mockingbird and written to the Events API. 
-
-```
-`price` Float32 `json:$.price` ,
-`timestamp` DateTime `json:$.timestamp` ,
-`symbol` String `json:$.symbol` ,
-```
-`company_info` - Mock data about ~85 fictional companies. 
-
-```
-`symbol` String,
-`name` String,
-`creation_date` Date,
-`sector` String,
+```sql
+%
+SELECT * FROM previous_node
+LIMIT {{Int32(events_per_page, 100)}}
+OFFSET {{Int32(page, 0) * Int32(events_per_page, 100)}
 ```
 
+If you want to use a single LIMIT statement: `LIMIT {{Int32(page, 0) * Int32(events_per_page, 100)},
 
-# Other things
+Learn more about pagination [HERE](https://www.tinybird.co/docs/query/query-parameters.html#pagination).
+
 
 ## Endpoint output objects
 
@@ -319,7 +347,60 @@ When pulling these objects from API Endpoints, here is what these `stock price" 
     "stock_symbol": "TTM"
 }
 ```
-## SQL helpers 
+
+## Renaming object attributes along the pipeline
+
+As you develop new and iterate old projects, it's nice to land on a set of SQL query templates that feel portable between Tinybird Workspaces. Here are some thoughts around naming your schema fields, selecting data types, and curating reusable queries.   
+
+### What's in a name (or data type)?
+
+As we develop projects, a lot of time will be spent writing queries around three fundamental attributes of an event:
+* Unique identifiers for the `sensors` that are emitting data.
+* Exactly when the event was emitted. Usually down to the second, and always in UTC.
+* The data value the sensor generated. This could be a 'delete' event from a CDC-connected database, a 'purchase' event from a mobile app, or a measurement from a weather station.
+
+For this project we are using the following field names and types to describe our data schema for these attributes: 
+* `symbol` String
+* `timestamp` DateTime
+* `price` Float32
+
+For this project, we are working with sensors with a unique string identifier and floating-point numeric data values, hence the `Sting` and `Float32` declarations.
+
+For the [Anomaly Detection project](https://github.com/tinybirdco/use-case-anomaly-detection), these fundamental fields were described as:
+* `id` Int16
+* `timestamp` DateTime
+* `value` Float32
+
+Although the *names* of the incoming floating-points are different (`price` and `value`), these labels can be easily altered and updated along the pipeline (see next section). The big difference is the different data types used as the unique sensor identifiers (`symbol` and `id`). Furthermore, it is common to have both sensor ids and data values be alphanumeric data types. 
+
+Given these different data types, you can expect to rewrite SQL developed for one to work with the other. 
+
+### Renaming attributes along the Pipeline.
+
+As you build multiple Tinybird Workspaces, you will find yourself borrowing queries developed in previous projects. You are sure to curate a set of fundamental queries that fit in with nearly any of your Workspaces. A query that returns the *most recent* events from a set of sensors is an example of an universally useful query. So, it's great when the inherited SQL already matches your new data schema. 
+
+As data travels from their source to your Pipe queries, you have several opportunities to customize the data attribute names you want to bake into your queries. Here are some places where you can update the names for object attributes:
+
+* **When generated**. Sometimes it is possible to affect the attribute names at the object source. For this project, with its Python data generator, there is complete control on the names and data types used. 
+* **In Data Source defintion**. Below is an example schema from a Data Source *definitional file* that maps an incoming JSON object to schema field names. Here we could instead have a line that updates a name: `value` Float32 `json:$.price` 
+
+```bash
+SCHEMA >
+    `price` Float32 `json:$.price`,
+    `symbol` String `json:$.symbol`,
+    `timestamp` DateTime `json:$.timestamp`
+```
+
+* **In SQL queries**. With SQL you can use aliases to rename attributes in SELECT statements. Any aliases are referenced in the other SQL sections, such as WHERE clauses.
+
+```sql
+SELECT value AS price
+WHERE price < 10
+```
+
+## More notes
+
+### SQL helpers 
 
 Formating numbers, trimming to 2 digits. 
 `ROUND(x,2)`
@@ -330,12 +411,3 @@ Renaming attributes.
 Comparing strings.
 `LOWER(thisCityName) = 'london'` 
 `UPPER(thisCityName) = 'LONDON'` 
-
-
-
-## Renaming objects along the pipeway
-
-* When generated.
-* In Data Source defintion.
-* In SQL queries.
-
