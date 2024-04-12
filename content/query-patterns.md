@@ -38,23 +38,44 @@ Note:
 * The sooner you standardize on the UTC timezone for all things time, the better. Let the client display composer convert to local time if needed. If you are working with data generators, push the data already in UTC. For example, with Python, be sure to generate timestamps in UTC (`current_time = datetime.datetime.utcnow()`). 
 * ClickHouse provides a set of time functions that make working with time data easier. Like most data environments, ClickHouse supports both Date and DateTime objects. Check out [this ClickHouse guide](https://clickhouse.com/docs/en/sql-reference/functions/date-time-functions) for the details (tere is also this ClickHouse [blog post](https://clickhouse.com/blog/working-with-time-series-data-and-functions-ClickHouse). Functions such as [toStartOfDay](https://clickhouse.com/docs/en/sql-reference/functions/date-time-functions#tostartofmonth) are fantastic for binning and processing time-series data. If you have ever needed to bin time data in SQL, you will really appreciate these functions.
 * Your Tinybird will be configured to store data in UTC. 
-  
 
-### Data from the most recent hour
+
+### Go-to functions for working with time fields
+
+* toDateTime(date)
+* parseDateTimeBestEffort
+* parseDateTimeBestEffortOrZero
+* parseDateTimeBestEffortOrNull
+
+[Learn more about the ClickHouse `parseDataTime` functions](https://clickhouse.com/docs/en/sql-reference/functions/type-conversion-functions#type_conversion_functions-parseDateTime).
+
+
+### Time query patterns
+
+#### Data from the most recent hour
+
 ```sql
 SELECT symbol, timestamp, price  
 FROM event_stream
-WHERE toDateTime(date) BETWEEN addHours(NOW(),-1) AND NOW()
+WHERE timestamp >= NOW() - INTERVAL 1 HOUR
 ```
 
-### Data between explicit dates
+```sql
+SELECT symbol, timestamp, price  
+FROM event_stream
+WHERE timestamp BETWEEN addHours(NOW(),-1) AND NOW()
+```
+
+
+
+#### Data between explicit dates
 ```sql
 SELECT symbol, timestamp, price  
 FROM event_stream
 WHERE toDateTime(date) BETWEEN '2023-12-07 17:22:00' AND '2023-12-07 17:23:00'
 ```
 
-### Data from yesterday, midnight to midnight
+#### Data from yesterday, midnight to midnight
 
 This SQL uses ClickHouse `today`,`yesterday`, and `toStartofDate` functions.
 
@@ -70,7 +91,7 @@ LIMIT 10000
 
 
 
-### Selecting most recent data 
+#### Selecting most recent data 
 
 To detect timeouts, the most recent data point from each sensor is looked up. This sounds simple enough, and it is one of the most simple detection methods. Like many things, there is more than one way to look most recent data.    
 
@@ -109,7 +130,7 @@ WHERE
 
 These queries do not narrow down the time range of interest. With anomaly detection and real-time data, we typically have a set of *time windows* of interest. In general, our time range of interest ranged from data from the most recent 10 seconds, to generating statistics over the previous thirty minutes.
 
-### Scanning periods of interext
+#### Scanning periods of interext
 
 If you have a data source with sensors that normally report every few seconds, it's likely that going ten seconds without a new report is a sign that a sensor is off-line. 
 
@@ -129,7 +150,7 @@ We also wanted to provide an API Endpoint for ad hoc timeout checks that support
 
 This [example Pipe file](https://github.com/tinybirdco/anomaly-detection/blob/main/data-project/pipes/timeout.pipe) illustrates how to build these dynamic parameters into the queries. 
 
-### Providing flexible query parameters
+#### Providing flexible query parameters
 
 Tinybird provides a *templating* syntax for building *dynamic* query parameters into your Tinybird API Endpoints. As you design your API endpoints, it is important to consider how your users will want to specify important attributes of the objects your API is serving. 
 
