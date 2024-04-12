@@ -11,7 +11,6 @@ This repository includes resources to help attendees find documentation and othe
 * [Building data analysis pipelines](/content/sections/building-pipelines.md)
 * [Introduction to Materialized Views](/content/sections/materialized-views.md)
 * [Introduction to the Tinybird CLI](/content/sections/intro-to-cli.md)
-* [Using version control with data projects](/content/sections/version-control.md)
 
 ## Prerequisites
 
@@ -24,7 +23,6 @@ This repository includes resources to help attendees find documentation and othe
   * [Recent Pull request and branch history](https://github.com/jimmoffitt/kafka-to-analytics/pulls?q=is%3Apr+is%3Aclosed)
   * [GitHub Actions managed by Tinybird CI/CD integration](https://github.com/jimmoffitt/kafka-to-analytics/actions)
 * Below you will find a PDF of the deck we used for our first workshop on February 13, 2024. 
-
 
 ## What are we building? 
 
@@ -56,7 +54,6 @@ Then we will create a Materialized View to provide hourly statistics:
   * Connecting to a Confluent stream of real-time (mocked) stock prices. 
 
     [See more here.](/content/sections/creating-data-sources.md)
-
 
 * Building data analysis pipelines
   * Getting started by developing SQL queries in Playgrounds.
@@ -90,9 +87,9 @@ Then we will create a Materialized View to provide hourly statistics:
 
 ## Workshop deck
 
-
 ![](images/deck.png)
 
+[Workshop deck from March 28, 2024](/content/Kafka-to-Analytics-workshop.pdf)
 [Workshop deck from February 13, 2024](/content/Kafka-to-Analytics-workshop.pdf)
 
 
