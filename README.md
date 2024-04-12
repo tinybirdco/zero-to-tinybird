@@ -1,6 +1,6 @@
 # The Zero-to-Tinybird Workshop 
 
-This repository is a companion piece to the 'Zero-to-Tinybird` 90-minute workshop. The intended audience of this workshop are people who have no experience with Tinybird and are looking to learn the basics with 90 minutes of hands on content. The intent of this workshop is to teach the basics of creating Data Sources, building Pipes, designing Materialized Views, deploying API Endpoints with dynamic query parameters, and providing introductions to the Tinybird command-line interface (CLI) and working with Tinybird projects under version control. 
+This repository is a companion piece to the 'Zero-to-Tinybird` 90-minute workshop. The intended audience of this workshop are people who have no experience with Tinybird and are looking to learn the basics with 90 minutes of hands on content. The intent of this workshop is to teach the basics of creating Data Sources, building Pipes, designing Materialized Views, deploying API Endpoints with dynamic query parameters and providing introductions to the Tinybird command-line interface (CLI). 
 
 This repository includes resources to help attendees find documentation and other content focused on these topics. It also includes the Data Project used in the workshop. Workshop content is based on a real-time stream of mocked stock prices and a supporting dimensional table of company metadata. 
 
@@ -78,19 +78,13 @@ Then we will create a Materialized View to provide hourly statistics:
 
     [See more here.](/content/sections/intro-to-cli.md)
 
-* Using version control with data projects
-  * Read our blog post describing [why we built version control features into Tinybird](https://www.tinybird.co/blog-posts/version-control-for-real-time-data). 
-
-    
-    [See more here.](/content/sections/version-control.md)
-
 
 ## Workshop deck
+The first workshop was held on February 13, 2024.
 
 ![](images/deck.png)
 
-[Workshop deck from March 28, 2024](/content/Kafka-to-Analytics-workshop.pdf)
-[Workshop deck from February 13, 2024](/content/Kafka-to-Analytics-workshop.pdf)
+[Current workshop deck](/content/Kafka-to-Analytics-workshop.pdf)
 
 
 
