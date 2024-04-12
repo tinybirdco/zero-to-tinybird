@@ -1,25 +1,37 @@
 ### Using version control with data projects
-  * The whys and hows of the Tinybird workflow with version control 
-  * Demonstrating adding new features in a Branch and building a Release.
 
-## Documentation
+'Under the hood', Tinybird Data Sources and Pipes are represented as configuration files. For this reason, Tinybird projects are made up of a collection of configuration files that can be managed as code. For this reason, using version control systems can be very useful for managing projects. 
 
-* [Version control introduction](https://versions.tinybird.co/docs/version-control/introduction.html)
-* [Working with version control](https://versions.tinybird.co/docs/version-control/working-with-version-control.html)
-* [Datafiles](https://versions.tinybird.co/docs/version-control/datafiles.html)
-* [Continuous Integration and Deployment (CI/CD)](https://versions.tinybird.co/docs/version-control/continuous-integration.html)
-* [Implementing test strategies](https://versions.tinybird.co/docs/version-control/implementing-test-strategies.html)
-* [Staging and production](https://versions.tinybird.co/docs/version-control/staging-and-production-workspaces.html)
-* [Deployment strategies](https://versions.tinybird.co/docs/version-control/deployment-strategies.html)
-* [Backfill strategies](https://versions.tinybird.co/docs/version-control/backfill-strategies.html)
-* [Common use cases](https://github.com/tinybirdco/use-case-examples)
+For example, this project includes a `company_info` Data Source. Here is its representation in a *.datasource file:
 
-## Blog posts
+```
+SCHEMA >
+    `symbol` String,
+    `name` String,
+    `creation_date` Date,
+    `sector` LowCardinality(String)
 
-* [Version Control for real-time data](https://www.tinybird.co/blog-posts/version-control-for-real-time-data)
-* [Iterate your real-time data pipelines with Git](https://www.tinybird.co/blog-posts/git-for-real-time-data-projects)
-* [Why iterating real-time data pipelines is so hard](https://www.tinybird.co/blog-posts/why-iterating-real-time-data-pipelines-is-hard)
-* [Automating data workflos with plaintext files and Git](https://www.tinybird.co/blog-posts/automating-data-workflows-with-git)
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYear(creation_date)"
+ENGINE_SORTING_KEY "symbol, sector, name"
+```
 
+And here is a the representation of the 'filter` Pipe in a *.pipe file:
 
+```
+TOKEN "filter_endpoint_read" READ
+
+NODE filter_by_symbol
+SQL >
+
+    %
+    SELECT timestamp, symbol, price
+    FROM event_stream
+    WHERE 1=1
+    {% if defined(company) %}
+      AND symbol = {{ String(company,description = 'String. Three-character stock symbol of interest.') }}
+    {% end %}
+    ORDER BY timestamp DESC
+    LIMIT 100 
+```
 
