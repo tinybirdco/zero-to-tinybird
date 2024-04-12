@@ -187,13 +187,7 @@ p.s. Always use UTC.
 
 Tinybird is built to help users unify their data sources. Our users want to combine their data sources in Tinybird so they can blend it all into their analysis and output. One of the most fundamental use cases for Tinybird is *enriching real-time data* with dimensional data. This is all made possible by *joining* the data. When you *JOIN* data in SQL you are linking, mapping, and associating common data attributes from two or more sources. 
 
-```sql
-SELECT es.timestamp, ci.symbol, es.price, ci.name, ci.sector
-FROM company_info ci, event_stream es
-WHERE ci.symbol = sps.symbol
-LIMIT 100
-```
-
+### Explicit JOIN
 ```sql
 SELECT es.timestamp, ci.symbol, es.price, ci.name, ci.sector
 FROM company_info ci
@@ -202,11 +196,24 @@ ON ci.symbol = es.symbol
 LIMIT 100
 ```
 
+### Implicit JOIN
+This form does not enable you to set the 'left' and 'right' JOINs, which is important when you have a high-volume event table and small dimensional tables.
+
+```sql
+SELECT es.timestamp, ci.symbol, es.price, ci.name, ci.sector
+FROM company_info ci, event_stream es
+WHERE ci.symbol = sps.symbol
+LIMIT 100
+```
+
 ## Calculating slope
 
 Developing a recipe for calculating data slopes or rates of change is surprisingly complicated (at least to me). To calculate the slope of two consectutive data points depends on *window* functions. The recipe below depends on the ClickHouse `lagInFrame` function (See this discussion on [ClickHouse window functions](https://clickhouse.com/docs/en/sql-reference/window-functions#functions)), which requires the construction of time window specification, e.g. `(PARTITION BY symbol ORDER BY date ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)`.
 
- (PARTITION BY partition_columns_list [ORDER BY order_by_columns_list] frame_specification)
+The general form looks like the following: 
+ (**PARTITION BY** partition_columns_list [**ORDER BY** order_by_columns_list] frame_specification)
+
+    Where: `frame_specification` in this case selects the previous, single value:  `ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING`
 
 
 ```sql
@@ -233,11 +240,17 @@ WHERE date > NOW() - INTERVAL time_window_minutes MINUTE
 
 ```
 
-## Anomaly detection with SQL
+## Generating statistics with SQL
+
+Learn more about [building real-time anomaly detection systems](https://www.tinybird.co/blog-posts/real-time-anomaly-detection).
+
+[] - TODO: update/rewrite when anomaly detection tutorials are available. 
 
 ### Interquartile Range
 
-The first step of the Interquartile Range (IQR) method is calculating the first and third quartiles (Q1 and Q3). These quartiles are based on a moving time window of the recent data.
+Here we develop interquartile ranges (IQRs) with a SQL common-table-expresion (CTE) that generates quaritiles over a time window. 
+
+The first step of the IQR method is calculating the first and third quartiles (Q1 and Q3). These quartiles are based on a moving time window of the recent data.
 
 The difference between these two quartiles is referred to as the IQR, as in:
 
@@ -248,10 +261,9 @@ Data points that are below or above some level based on a multiplier of this IQR
 values < Q1 - (IQR * 1.5)
 values > Q3 + (IQR * 1.5)
 
-
 ```sql
 WITH stats AS (SELECT symbol
-quantileExact(0.25) (price) AS lower_quartile,
+  quantileExact(0.25) (price) AS lower_quartile,
 quantileExact(0.75) (price) AS upper_quartile,
 (upper_quartile - lower_quartile) * 1.5 AS IQR
 FROM event_stream
@@ -273,6 +285,7 @@ LIMIT 10
 ```
 
 ### Z-Score
+Here we develop Z-scores with a SQL common-table-expresion (CTE) that generates averages and standard deviations over a time window to calculate the score. 
 
 This implements a simple algorith based on a time-series average and standard deviation over a minute-scale window of data. Each incoming data point, x, has a Z-Score calculated in this way:  
 
@@ -311,9 +324,6 @@ JOIN stats s ON s.symbol = es.symbol
 WHERE date BETWEEN NOW() - INTERVAL _anomaly_scan_time_window_seconds SECOND AND NOW()
 ORDER BY date DESC
 ```
-
-# Other things
-
 ## Pagination
 
 Tinybird projects are typically built with massive amounts of data and require a pagination method to enable API Endpoint clients to request data in consumable chunks. API Endpoints will generate a maximum of 10 MB of data per request. API Endpoint clients are responsible for managing 'page' requests. 
@@ -330,7 +340,6 @@ Here is an example query that uses the `LIMIT #, #` form to set the *offset* (fi
   ORDER BY visits DESC
   LIMIT 0, 100
 ```
-
 In this case, we want to start from the beginning (row 0). The second number (100) specifies the limit, which is the maximum number of rows to return. So, the query will return a maximum of 100 rows, starting from the first row (offset 0). Since the results rank the top number of visits (by ordering visits in descending order), this will return the top 100. If you want to request visits ranked 101-200, the LIMIT statement would be updated to `LIMIT 100, 100`.
 
 Here is an example query snippet that establishes `events_per_page` and `page` query parameters:
@@ -345,6 +354,8 @@ OFFSET {{Int32(page, 0) * Int32(events_per_page, 100)}
 If you want to use a single LIMIT statement: `LIMIT {{Int32(page, 0) * Int32(events_per_page, 100)},
 
 Learn more about pagination [HERE](https://www.tinybird.co/docs/query/query-parameters.html#pagination).
+
+# Other things
 
 
 ## Endpoint output objects
