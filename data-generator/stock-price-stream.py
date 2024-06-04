@@ -11,17 +11,23 @@ import requests
 from confluent_kafka import Producer, KafkaError
 from dotenv import load_dotenv
 
+# write_to
+WRITE_TO = "kafka" # or "tinybird"
+
 # Load from .env file.
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+load_dotenv(dotenv_path)
+
+TINYBIRD_TOKEN = os.getenv("TINYBIRD_TOKEN")
+TINYBIRD_URL = "https://api.tinybird.co/v0/events?name=incoming_data"
+HEADERS = {"Authorization": f"Bearer {TINYBIRD_TOKEN}", "Content-Type": "application/json"}
+
+COMPANY_INFO = './company-info.csv'
+
 CONFLUENT_SERVER = os.getenv("CONFLUENT_SERVER")
 CONFLUENT_KEY = os.getenv("CONFLUENT_KEY")
 CONFLUENT_SECRET = os.getenv("CONFLUENT_SECRET")
 TOPIC_NAME = os.getenv("TOPIC_NAME")
-TINYBIRD_TOKEN = os.getenv("TINYBIRD_TOKEN")
-
-COMPANY_INFO = './company-info.csv'
-
-dotenv_path = os.path.join(os.path.dirname(__file__), '../config', '.env')
-load_dotenv(dotenv_path)
 
 # Load "app settings" from YAML file. 
 with open('./settings.yaml') as file:
@@ -151,6 +157,38 @@ def sensor_presets(sensors, config):
         sensors[id].reports.append(report)
 
     return sensors
+
+def send(events):
+
+    #if kafka/confluent
+    pass
+    #if not, the Events AP!
+
+def assemble_payload(events):
+    pass
+    payload = ''
+    for event in events:
+        json_string = json.dumps(event)
+        payload += json_string + '\n'
+
+    return payload
+
+
+def send_to_events(events):
+
+    pass
+
+    reports_json = assemble_payload(events)
+    #reports_json = json.dumps(sensor.reports)
+    response = requests.post(tinybird_url, headers=headers, data=reports_json)
+    status_code = response.status_code
+    
+    if status_code >= 200 and status_code <= 202:
+        reports = []
+        sensor.reports = []
+        batched_reports = 0
+    else:
+        print(f"Events request error: {response.status_code} : {response.reason}")  
 
 def send_to_kafka(producer, events):
     # Looping through events and publishing to Kafka topic.
@@ -285,7 +323,16 @@ def generate():
             print(f"Publishing {len(reports)} events to Kafka stream...")
 
             # TODO: Add error handling... 
-            data_published = send_to_kafka(producer, reports) # Sending in ndjson string of newlined JSON objects.
+
+            #data_published = send(reports)
+
+            if WRITE_TO == "kafka":
+                data_published = send_to_kafka(producer, reports) # Sending in ndjson string of newlined JSON objects.
+            elif WRITE_TO == "events":
+                data_published = send_to_events(reports) # Sending in ndjson string of newlined JSON objects.
+            else:
+                pass # ERROR
+
             
             # If all went, clear the counters for the next round. 
             if data_published:
